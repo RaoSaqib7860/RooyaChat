@@ -1,0 +1,176 @@
+name: rooya
+description: A new Flutter project.
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+  flutter_svg: any
+  get: any
+  sizer: any
+  pin_code_fields: any
+  flutter_spinkit: any
+  carousel_slider: any
+  circular_profile_avatar: any
+  flutter_slidable: any
+  expendable_fab: any
+  country_code_picker: any
+  get_storage: ^2.0.3
+  dio: ^4.0.4
+  http: ^0.13.4
+  cached_network_image: ^3.2.0
+  socket_io_client: ^1.0.2
+  socket_io: ^1.0.1
+  web_socket_channel: ^2.1.0
+  flutter_io_socket: ^0.0.7
+  timeago: ^3.1.0
+  file_picker: ^4.1.5
+  better_player: ^0.0.81
+  just_audio: ^0.9.18
+  rxdart: ^0.27.3
+  audio_video_progress_bar: ^0.10.0
+  record: ^3.0.2
+  path_provider: ^2.0.8
+  open_file: ^3.2.1
+  image_gallery_saver: ^1.7.1
+  path: ^1.8.0
+  flutter_launcher_icons: ^0.9.2
+  record_mp3: ^3.0.0
+  photo_view: ^0.13.0
+  image_picker: ^0.8.4+2
+  intl: ^0.17.0
+  video_player: ^2.2.11
+  visibility_detector: ^0.2.2
+  focused_menu: ^1.0.5
+  swipe_to: ^0.1.0-nullsafety.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+flutter_icons:
+  ios: true
+  android: true
+  image_path_ios: "assets/launcher_icon.png"
+  image_path_android: "assets/launcher_icon.png"
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/
+    - assets/svg/
+    - assets/user/
+    - assets/setting/svg/
+  #   - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware.
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: segmdl2
+      fonts:
+        - asset: assets/fonts/segmdl2.ttf
+    - family: segoepr
+      fonts:
+        - asset: assets/fonts/segoepr.ttf
+    - family: segoeprb
+      fonts:
+        - asset: assets/fonts/segoeprb.ttf
+    - family: segoesc
+      fonts:
+        - asset: assets/fonts/segoesc.ttf
+    - family: segoescb
+      fonts:
+        - asset: assets/fonts/segoescb.ttf
+    - family: segoeui
+      fonts:
+        - asset: assets/fonts/segoeui.ttf
+    - family: segoeuib
+      fonts:
+        - asset: assets/fonts/segoeuib.ttf
+    - family: segoeuii
+      fonts:
+        - asset: assets/fonts/segoeuii.ttf
+    - family: segoeuil
+      fonts:
+        - asset: assets/fonts/segoeuil.ttf
+    - family: segoeuisl
+      fonts:
+        - asset: assets/fonts/segoeuisl.ttf
+    - family: segoeuiz
+      fonts:
+        - asset: assets/fonts/segoeuiz.ttf
+    - family: seguibl
+      fonts:
+        - asset: assets/fonts/seguibl.ttf
+    - family: seguibli
+      fonts:
+        - asset: assets/fonts/seguibli.ttf
+    - family: seguiemj
+      fonts:
+        - asset: assets/fonts/seguiemj.ttf
+    - family: seguihis
+      fonts:
+        - asset: assets/fonts/seguihis.ttf
+    - family: seguili
+      fonts:
+        - asset: assets/fonts/seguili.ttf
+    - family: seguisb
+      fonts:
+        - asset: assets/fonts/seguisb.ttf
+    - family: seguisli
+      fonts:
+        - asset: assets/fonts/seguisli.ttf
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
