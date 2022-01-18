@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:rooya/ApiConfig/ApiUtils.dart';
 import 'package:rooya/ClickController/SelectIndexController.dart';
+import 'package:rooya/SearchUser/SearchUser.dart';
 import 'package:rooya/User/user_chat_information.dart';
 import 'package:rooya/text_filed/app_font.dart';
 
@@ -26,6 +27,9 @@ class _MySliverState extends State<MySliver> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
+          SizedBox(
+            height: 9,
+          ),
           ListTile(
               leading: CircularProfileAvatar(
                 storage.read('profile') ==
@@ -42,21 +46,20 @@ class _MySliverState extends State<MySliver> {
                     fontWeight: FontWeight.bold,
                     fontFamily: AppFonts.segoeui),
               ),
-              subtitle: Padding(
-                padding: EdgeInsets.only(top: 4),
-                child: Text(
-                  '',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 13,
-                      fontFamily: AppFonts.segoeui),
-                ),
-              ),
               trailing: Wrap(
                 children: [
                   InkWell(
+                    child: Icon(
+                      CupertinoIcons.search,
+                    ),
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (c) => SearchUser()));
+                    },
+                  ),
+                  InkWell(
                       onTap: () {
-                       // return createAlertDialoge1(context);
+                        // return createAlertDialoge1(context);
                       },
                       child: Icon(
                         CupertinoIcons.bell_solid,
@@ -64,9 +67,7 @@ class _MySliverState extends State<MySliver> {
                         size: 23,
                       )),
                   InkWell(
-                      onTap: () {
-
-                      },
+                      onTap: () {},
                       child: Container(
                         height: 20,
                         width: 20,
@@ -75,49 +76,49 @@ class _MySliverState extends State<MySliver> {
                 ],
                 spacing: 8,
               )),
-          Container(
-            height: height * 0.045,
-            width: width,
-            margin: EdgeInsets.symmetric(horizontal: 10),
-            padding: EdgeInsets.only(left: 10, right: 0),
-            child: TextFormField(
-              onChanged: (value) {
-                selectController.search.value = value;
-                print('selectController search is = ${selectController.search.value}');
-              },
-              style: TextStyle(fontSize: 14),
-              decoration: InputDecoration(
-                disabledBorder: new OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: new BorderSide(
-                      color: Colors.black12,
-                    )),
-                focusedBorder: new OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: new BorderSide(
-                      color: Colors.black12,
-                    )),
-                enabledBorder: new OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: new BorderSide(
-                      color: Colors.black12,
-                    )),
-                border: new OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: new BorderSide(
-                      color: Colors.black12,
-                    )),
-                isDense: true,
-                hintText: 'Search here ...',
-                hintStyle: TextStyle(fontSize: 10, color: Colors.black),
-                suffixIcon: Icon(
-                  Icons.search,
-                  size: 20,
-                  color: Color(0XFF0BAB0D),
-                ),
-              ),
-            ),
-          ),
+          // Container(
+          //   height: height * 0.045,
+          //   width: width,
+          //   margin: EdgeInsets.symmetric(horizontal: 10),
+          //   padding: EdgeInsets.only(left: 10, right: 0),
+          //   child: TextFormField(
+          //     onChanged: (value) {
+          //       selectController.search.value = value;
+          //       print('selectController search is = ${selectController.search.value}');
+          //     },
+          //     style: TextStyle(fontSize: 14),
+          //     decoration: InputDecoration(
+          //       disabledBorder: new OutlineInputBorder(
+          //           borderRadius: BorderRadius.circular(30),
+          //           borderSide: new BorderSide(
+          //             color: Colors.black12,
+          //           )),
+          //       focusedBorder: new OutlineInputBorder(
+          //           borderRadius: BorderRadius.circular(30),
+          //           borderSide: new BorderSide(
+          //             color: Colors.black12,
+          //           )),
+          //       enabledBorder: new OutlineInputBorder(
+          //           borderRadius: BorderRadius.circular(30),
+          //           borderSide: new BorderSide(
+          //             color: Colors.black12,
+          //           )),
+          //       border: new OutlineInputBorder(
+          //           borderRadius: BorderRadius.circular(30),
+          //           borderSide: new BorderSide(
+          //             color: Colors.black12,
+          //           )),
+          //       isDense: true,
+          //       hintText: 'Search here ...',
+          //       hintStyle: TextStyle(fontSize: 10, color: Colors.black),
+          //       suffixIcon: Icon(
+          //         Icons.search,
+          //         size: 20,
+          //         color: Color(0XFF0BAB0D),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

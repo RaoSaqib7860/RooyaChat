@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -97,7 +98,7 @@ class OneToOneChatProvider extends GetxController {
           }
         });
         socket!.on('newMessage', (value) {
-          print('newMessage = $value');
+          log('newMessage is = $value');
           oneToOneChat.insert(0, OneToOneChatModel.fromJson(value));
         });
         socket!.on('receiveSeen', (value) {

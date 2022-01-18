@@ -134,7 +134,7 @@ class _RoomsScreenState extends State<RoomsScreen> {
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
-                    fontSize: 20,
+                    fontSize: 18,
                     fontFamily: AppFonts.segoeui),
               ),
               trailing: Icon(

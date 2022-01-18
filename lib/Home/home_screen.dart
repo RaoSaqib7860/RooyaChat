@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:rooya/ApiConfig/SizeConfiq.dart';
 import 'package:rooya/ClickController/SelectIndexController.dart';
 import 'package:rooya/Home/chat_screen.dart';
 import 'package:rooya/Home/friends_screen.dart';
 import 'package:rooya/Home/group_screen.dart';
 import 'package:rooya/Home/rooms_screen.dart';
+import 'package:rooya/responsive/primary_color.dart';
 import 'package:rooya/sliver_class/sliver.dart';
 import 'package:get/get.dart';
 
@@ -43,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -55,9 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     headerSliverBuilder: (context, isScrool) {
                       return [
                         SliverAppBar(
-                          automaticallyImplyLeading: false,
-                          collapsedHeight: 130,
-                          expandedHeight: 130,
+                          automaticallyImplyLeading: false,elevation: 0,
+                          collapsedHeight: height * 0.110,backgroundColor: Colors.white,
+                          expandedHeight: height * 0.110,
                           flexibleSpace: MySliver(),
                         ),
                         SliverPersistentHeader(
@@ -88,18 +91,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                               color: selectController
                                                           .listofBool[index] ==
                                                       true
-                                                  ? Colors.white
-                                                  : Color(0XFF5A5A5A))),
+                                                  ? buttonColor
+                                                  : Colors.black)),
                                       decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: Colors.black12),
                                           borderRadius:
                                               BorderRadius.circular(3),
-                                          color: selectController
-                                                      .listofBool[index] ==
-                                                  true
-                                              ? Color(0XFF0BAB0D)
-                                              : Colors.white),
+                                          color:  Colors.white),
                                     ),
                                   ),
                                 );

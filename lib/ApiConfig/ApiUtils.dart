@@ -15,6 +15,8 @@ final login = 'login/';
 final sendMessage = 'sendMessage';
 final getMessage = 'getMessage';
 final friendList = 'friendList';
+final removeGroup ='removeGroup';
+final removeMessage='removePost';
 
 GetStorage storage = GetStorage();
 Map<String, String> header = {
@@ -29,6 +31,32 @@ class ApiUtils {
       var responce = await http.post(url, headers: header, body: map);
       var data = jsonDecode(responce.body);
       print('group data is = $data');
+      if (data['status']['code'] == 200) {
+      } else {}
+    } catch (e) {
+      print('Exception is = $e');
+    }
+  }
+
+  static Future removeMessageApi({Map? map}) async {
+    var url = Uri.parse('$baseUrl$removeMessage');
+    try {
+      var responce = await http.post(url, headers: header, body: map);
+      var data = jsonDecode(responce.body);
+      print('remove Message data is = $data');
+      if (data['status']['code'] == 200) {
+      } else {}
+    } catch (e) {
+      print('Exception is = $e');
+    }
+  }
+
+  static Future removeGroupApi({Map? map}) async {
+    var url = Uri.parse('$baseUrl$removeGroup');
+    try {
+      var responce = await http.post(url, headers: header, body: map);
+      var data = jsonDecode(responce.body);
+      print('remove group data is = $data');
       if (data['status']['code'] == 200) {
       } else {}
     } catch (e) {
@@ -57,13 +85,14 @@ class ApiUtils {
   }
 
   static Future<SearchUserModel> getfriendList({int? limit, int? start}) async {
-    var url = Uri.parse('https://chat.rooyatech.com/user/friendList?limit=$limit&start=$start');
+    var url = Uri.parse(
+        'https://chat.rooyatech.com/user/friendList?limit=$limit&start=$start');
     try {
       var responce = await http.get(url, headers: header);
       var data = jsonDecode(responce.body);
       log('friend data is = $data');
       if (data['status'] is Map) {
-        SearchUserModel modellist =SearchUserModel.fromJson(data['response']);
+        SearchUserModel modellist = SearchUserModel.fromJson(data['response']);
         return modellist;
       } else {
         return SearchUserModel();
@@ -85,7 +114,7 @@ class ApiUtils {
       if (data['status']['code'] == 200) {
         List list = data['response'];
         List<OneToOneChatModel> modellist =
-        list.map((e) => OneToOneChatModel.fromJson(e)).toList();
+            list.map((e) => OneToOneChatModel.fromJson(e)).toList();
         return modellist.reversed.toList();
       } else {
         return [];

@@ -3,15 +3,20 @@ import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:focused_menu/focused_menu.dart';
-import 'package:focused_menu/modals.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:rooya/ApiConfig/ApiUtils.dart';
 import 'package:rooya/ClickController/SelectIndexController.dart';
 import 'package:rooya/GlobalWidget/Photo_View_Class.dart';
+import 'package:rooya/ModelClasses/GroupModel.dart';
 import 'package:rooya/OneToOneChat.dart';
+import 'package:rooya/PluginComponents/FocusedMenu/focused_menu.dart';
+import 'package:rooya/PluginComponents/FocusedMenu/modals.dart';
 import 'package:rooya/Providers/ChatScreenProvider.dart';
 import 'package:rooya/Request/chat_request.dart';
+import 'package:rooya/SearchUser/SearchUser.dart';
+import 'package:rooya/responsive/primary_color.dart';
 import 'package:rooya/slidable/expendiable.dart';
 import 'package:rooya/text_filed/app_font.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -43,6 +48,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   DateFormat sdf2 = DateFormat("hh.mm aa");
 
+  var listOfSelectedMember = <GroupModel>[].obs;
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -52,282 +59,394 @@ class _ChatScreenState extends State<ChatScreen> {
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: ListTile(
-              title: InkWell(
-                onTap: () {
-                  return createAlertDialoge(context);
-                },
-                child: Text(
-                  'Chats',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 20,
-                      fontFamily: AppFonts.segoeui),
-                ),
-              ),
-              trailing: FocusedMenuHolder(
-                blurSize: 5.0,
-                menuItemExtent: 45,
-                menuWidth: width * 0.4,
-                menuOffset: 0,
-                openWithTap: true,
-                blurBackgroundColor: Colors.black54,
-                menuItems: <FocusedMenuItem>[
-                  FocusedMenuItem(title: Text("Select All"), onPressed: () {}),
-                  FocusedMenuItem(title: Text("Delete All"), onPressed: () {}),
-                  FocusedMenuItem(title: Text("Mark All"), onPressed: () {}),
-                ],
-                onPressed: () {},
-                child: Icon(
-                  Icons.more_vert,
-                  color: Colors.black,
-                  size: 20,
-                ),
-              ),
-            ),
+            child: listOfSelectedMember.isNotEmpty
+                ? Container(
+                    decoration:
+                        BoxDecoration(color: primaryColor.withOpacity(0.5)),
+                    child: Row(
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              listOfSelectedMember.clear();
+                              setState(() {});
+                            },
+                            icon: Icon(Icons.clear)),
+                        Text('${listOfSelectedMember.length}'),
+                        Expanded(
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(
+                                Icons.volume_off,
+                                size: 20,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(
+                                Icons.push_pin,
+                                size: 20,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () async {
+                                for (var i = 0;
+                                    i < listOfSelectedMember.length;
+                                    i++) {
+                                  Map payLoad = {
+                                    'g_id': listOfSelectedMember[i]
+                                        .groupId
+                                        .toString(),
+                                    'userId': listOfSelectedMember[i].senderId.toString()
+                                  };
+                                  ApiUtils.removeGroupApi(map: payLoad);
+                                  controller.listofMember
+                                      .remove(listOfSelectedMember[i]);
+                                }
+                                listOfSelectedMember.clear();
+                              },
+                              icon: Icon(
+                                CupertinoIcons.delete,
+                                size: 20,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(
+                                Icons.more_vert,
+                                size: 20,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            )
+                          ],
+                        ))
+                      ],
+                    ),
+                  )
+                : ListTile(
+                    title: InkWell(
+                      onTap: () {
+                        return createAlertDialoge(context);
+                      },
+                      child: Text(
+                        'Chats',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontFamily: AppFonts.segoeui),
+                      ),
+                    ),
+                    trailing: FocusedMenuHolder(
+                      blurSize: 5.0,
+                      menuItemExtent: 45,
+                      menuWidth: width * 0.4,
+                      menuOffset: 0,
+                      openWithTap: true,
+                      blurBackgroundColor: Colors.black54,
+                      onCneTapMenuItems: <FocusedMenuItem>[
+                        FocusedMenuItem(
+                            title: Text("Select All"), onPressed: () {}),
+                        FocusedMenuItem(
+                            title: Text("Delete All"), onPressed: () {}),
+                        FocusedMenuItem(
+                            title: Text("Mark All"), onPressed: () {}),
+                      ],
+                      onPressed: () {},
+                      child: Icon(
+                        Icons.more_vert,
+                        color: Colors.black,
+                        size: 20,
+                      ),
+                    ),
+                  ),
           ),
           Obx(
             () => SliverList(
                 delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
               if (selectedIndexController.searchValue.value.isEmpty) {
-                return FocusedMenuHolder(
-                  blurSize: 5.0,
-                  menuItemExtent: 45,
-                  menuWidth: width * 0.4,
-                  menuOffset: 0,
-                  blurBackgroundColor: Colors.black54,
-                  menuItems: <FocusedMenuItem>[
-                    FocusedMenuItem(
-                        title: Text("Clear Chat"), onPressed: () {}),
-                    FocusedMenuItem(
-                        title: Text("Clear Media"), onPressed: () {}),
-                    FocusedMenuItem(title: Text("Mute"), onPressed: () {}),
-                    FocusedMenuItem(title: Text("Info"), onPressed: () {}),
-                    FocusedMenuItem(title: Text("Pin"), onPressed: () {}),
-                    FocusedMenuItem(
-                        title: Text(
-                          "Exit Group",
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        onPressed: () {}),
-                    FocusedMenuItem(
-                        title: Text(
-                          "Delete",
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        onPressed: () {}),
-                  ],
-                  onPressed: () {},
-                  child: Column(
-                    children: [
-                      Slidable(
-                        endActionPane: ActionPane(
-                          motion: ScrollMotion(),
-                          children: [
-                            ClipOval(
-                              child: Container(
-                                height: 50,
-                                width: 50,
-                                child: Center(
-                                  child: SlidableAction(
-                                    // An action can be bigger than the others.
-                                    backgroundColor: Color(0xFF7BC043),
-                                    foregroundColor: Colors.white,
-                                    icon: CupertinoIcons.speaker_2_fill,
-                                    onPressed: (index) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(snackBar);
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(left: 5),
-                              child: ClipOval(
-                                child: Container(
-                                  height: 50,
-                                  width: 50,
-                                  child: Center(
-                                    child: SlidableAction(
-                                      onPressed: (index) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(snackBar);
-                                      },
-                                      backgroundColor:
-                                          CupertinoColors.destructiveRed,
-                                      foregroundColor: Colors.white,
-                                      icon: CupertinoIcons.delete,
+                return "${controller.listofMember[index].recentMessage}" ==
+                        'You: '
+                    ? SizedBox()
+                    : Column(
+                        children: [
+                          Slidable(
+                            endActionPane: ActionPane(
+                              motion: ScrollMotion(),
+                              children: [
+                                ClipOval(
+                                  child: Container(
+                                    height: 50,
+                                    width: 50,
+                                    child: Center(
+                                      child: SlidableAction(
+                                        // An action can be bigger than the others.
+                                        backgroundColor: Color(0xFF7BC043),
+                                        foregroundColor: Colors.white,
+                                        icon: CupertinoIcons.speaker_2_fill,
+                                        onPressed: (index) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(snackBar);
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        startActionPane: ActionPane(
-                          motion: const ScrollMotion(),
-                          dismissible: DismissiblePane(
-                            key: GlobalKey(),
-                            onDismissed: () {
-                              // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                            },
-                          ),
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 8),
-                              child: ClipOval(
-                                child: Container(
-                                  height: 50,
-                                  width: 50,
-                                  child: Center(
-                                    child: SlidableAction(
-                                      onPressed: (index) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(snackBar);
-                                      },
-                                      backgroundColor: CupertinoColors.link,
-                                      foregroundColor: Colors.white,
-                                      icon: CupertinoIcons.italic,
+                                Padding(
+                                  padding: EdgeInsets.only(left: 5),
+                                  child: ClipOval(
+                                    child: Container(
+                                      height: 50,
+                                      width: 50,
+                                      child: Center(
+                                        child: SlidableAction(
+                                          onPressed: (index) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                          },
+                                          backgroundColor:
+                                              CupertinoColors.destructiveRed,
+                                          foregroundColor: Colors.white,
+                                          icon: CupertinoIcons.delete,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(left: 8),
-                              child: ClipOval(
-                                child: Container(
-                                  height: 50,
-                                  width: 50,
-                                  child: Center(
-                                    child: SlidableAction(
-                                      onPressed: (index) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(snackBar);
-                                      },
-                                      backgroundColor: Color(0xFF21B7CA),
-                                      foregroundColor: Colors.white,
-                                      icon: CupertinoIcons.pin_fill,
+                            startActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              dismissible: DismissiblePane(
+                                key: GlobalKey(),
+                                onDismissed: () {
+                                  // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                },
+                              ),
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 8),
+                                  child: ClipOval(
+                                    child: Container(
+                                      height: 50,
+                                      width: 50,
+                                      child: Center(
+                                        child: SlidableAction(
+                                          onPressed: (index) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                          },
+                                          backgroundColor: CupertinoColors.link,
+                                          foregroundColor: Colors.white,
+                                          icon: CupertinoIcons.italic,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            InkWell(
-                              child: ListTile(
-                                leading: CircularProfileAvatar(
-                                  '',
-                                  radius: 28,
-                                  child: CachedNetworkImage(
-                                    imageUrl:
-                                        "${controller.listofMember[index].members![0].profilePictureUrl}",
-                                    placeholder: (context, url) =>
-                                        CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) =>
-                                        Icon(Icons.error),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 8),
+                                  child: ClipOval(
+                                    child: Container(
+                                      height: 50,
+                                      width: 50,
+                                      child: Center(
+                                        child: SlidableAction(
+                                          onPressed: (index) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                          },
+                                          backgroundColor: Color(0xFF21B7CA),
+                                          foregroundColor: Colors.white,
+                                          icon: CupertinoIcons.pin_fill,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  onTap: () {
-                                    Get.to(Photo_View_Class(
-                                      url:
-                                          "${controller.listofMember[index].members![0].profilePictureUrl}",
-                                    ));
-                                  },
                                 ),
-                                title: Text(
-                                  "${controller.listofMember[index].members![0].firstName}" +
-                                      " ${controller.listofMember[index].members![0].lastName}",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontFamily: AppFonts.segoeui,
-                                      fontSize: 16),
-                                ),
-                                subtitle: Text(
-                                  controller.listofMember[index].messageType ==
-                                          'text'
-                                      ? "${controller.listofMember[index].recentMessage}"
-                                      : "${controller.listofMember[index].recentMessage}"
-                                              .split(':')[0] +
-                                          ' : ' +
-                                          '${controller.listofMember[index].messageType}',
-                                  style: TextStyle(
-                                      color: Color(0XFF373737),
-                                      fontFamily: AppFonts.segoeui,
-                                      fontSize: 12),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                trailing: Column(
-                                  mainAxisSize: MainAxisSize.min,
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
                                   children: [
-                                    "${controller.listofMember[index].pendingMessage}" ==
-                                            '0'
-                                        ? SizedBox()
-                                        : Container(
-                                            decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.green),
-                                            child: Text(
-                                              "${controller.listofMember[index].pendingMessage}",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 10,
-                                                  fontFamily: AppFonts.segoeui),
-                                            ),
-                                            padding: EdgeInsets.all(5),
-                                          ),
                                     SizedBox(
-                                      height: 5,
+                                      width: 10,
                                     ),
-                                    Text(
-                                      //'${timeago.format(DateTime.parse("${controller.listofMember[index].lastActive}"), locale: 'en_short')} ago',
-                                      '${sdf2.format(DateTime.parse("${controller.listofMember[index].lastActive}").toUtc().toLocal())}',
-                                      style: TextStyle(
-                                          color: Color(0XFF373737),
-                                          fontSize: 10,
-                                          fontFamily: AppFonts.segoeui),
-                                    )
+                                    listOfSelectedMember.isNotEmpty
+                                        ? !listOfSelectedMember.contains(
+                                                controller.listofMember[index])
+                                            ? Container(
+                                                height: 20,
+                                                width: 20,
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                        width: 1,
+                                                        color: buttonColor)),
+                                              )
+                                            : Container(
+                                                height: 20,
+                                                width: 20,
+                                                child: Icon(
+                                                  Icons.check_circle,
+                                                  color: buttonColor,
+                                                ),
+                                              )
+                                        : SizedBox(),
+                                    Expanded(
+                                      child: InkWell(
+                                        child: ListTile(
+                                          leading: CircularProfileAvatar(
+                                            '',
+                                            radius: 28,
+                                            child: CachedNetworkImage(
+                                              imageUrl:
+                                                  "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                              placeholder: (context, url) =>
+                                                  CircularProgressIndicator(),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Icon(Icons.error),
+                                              fit: BoxFit.cover,
+                                            ),
+                                            onTap: () {
+                                              Get.to(Photo_View_Class(
+                                                url:
+                                                    "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                              ));
+                                            },
+                                            imageFit: BoxFit.cover,
+                                          ),
+                                          title: Text(
+                                            "${controller.listofMember[index].members![0].firstName}" +
+                                                " ${controller.listofMember[index].members![0].lastName}",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontFamily: AppFonts.segoeui,
+                                                fontSize: 16),
+                                          ),
+                                          subtitle: Text(
+                                            controller.listofMember[index]
+                                                        .messageType ==
+                                                    'text'
+                                                ? "${controller.listofMember[index].recentMessage}"
+                                                : "${controller.listofMember[index].recentMessage}"
+                                                        .split(':')[0] +
+                                                    ' : ' +
+                                                    '${controller.listofMember[index].messageType}',
+                                            style: TextStyle(
+                                                color: Color(0XFF373737),
+                                                fontFamily: AppFonts.segoeui,
+                                                fontSize: 12),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          trailing: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              "${controller.listofMember[index].pendingMessage}" ==
+                                                      '0'
+                                                  ? SizedBox()
+                                                  : Container(
+                                                      decoration: BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: Colors.green),
+                                                      child: Text(
+                                                        "${controller.listofMember[index].pendingMessage}",
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 10,
+                                                            fontFamily: AppFonts
+                                                                .segoeui),
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.all(5),
+                                                    ),
+                                              SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                //'${timeago.format(DateTime.parse("${controller.listofMember[index].lastActive}"), locale: 'en_short')} ago',
+                                                '${sdf2.format(DateTime.parse("${controller.listofMember[index].lastActive}").toUtc().toLocal())}',
+                                                style: TextStyle(
+                                                    color: Color(0XFF373737),
+                                                    fontSize: 10,
+                                                    fontFamily:
+                                                        AppFonts.segoeui),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          if (listOfSelectedMember.isEmpty) {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (c) =>
+                                                        OneToOneChat(
+                                                          groupID: controller
+                                                              .listofMember[
+                                                                  index]
+                                                              .groupId
+                                                              .toString(),
+                                                          name: "${controller.listofMember[index].members![0].firstName} " +
+                                                              "${controller.listofMember[index].members![0].lastName}",
+                                                          profilePic:
+                                                              "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                        ))).then((value) async {
+                                              await controller.getGroupList();
+                                              setState(() {});
+                                            });
+                                          } else {
+                                            if (!listOfSelectedMember.contains(
+                                                controller
+                                                    .listofMember[index])) {
+                                              listOfSelectedMember.add(
+                                                  controller
+                                                      .listofMember[index]);
+                                            } else {
+                                              listOfSelectedMember.remove(
+                                                  controller
+                                                      .listofMember[index]);
+                                            }
+                                            setState(() {});
+                                          }
+                                        },
+                                        onLongPress: () {
+                                          if (!listOfSelectedMember.contains(
+                                              controller.listofMember[index])) {
+                                            listOfSelectedMember.add(
+                                                controller.listofMember[index]);
+                                          } else {
+                                            listOfSelectedMember.remove(
+                                                controller.listofMember[index]);
+                                          }
+                                          setState(() {});
+                                        },
+                                      ),
+                                    ),
                                   ],
                                 ),
-                              ),
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (c) => OneToOneChat(
-                                              groupID: controller
-                                                  .listofMember[index].groupId
-                                                  .toString(),
-                                              name: "${controller.listofMember[index].members![0].firstName} " +
-                                                  "${controller.listofMember[index].members![0].lastName}",
-                                              profilePic:
-                                                  "${controller.listofMember[index].members![0].profilePictureUrl}",
-                                            ))).then((value) async {
-                                  await controller.getGroupList();
-                                  setState(() {});
-                                });
-                              },
+                                Container(
+                                  height: 1,
+                                  color: Colors.black12,
+                                  margin: EdgeInsets.only(
+                                      left: width * 0.23,
+                                      right: width * 0.040,
+                                      bottom: height * 0.018),
+                                ),
+                              ],
                             ),
-                            Container(
-                              height: 1,
-                              color: Colors.black12,
-                              margin: EdgeInsets.only(
-                                  left: width * 0.23,
-                                  right: width * 0.040,
-                                  bottom: height * 0.018),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+                          ),
+                        ],
+                      );
               } else if ("${controller.listofMember[index].members![0].firstName} ${controller.listofMember[index].members![0].lastName}"
                   .contains(selectedIndexController.searchValue.value)) {
                 return Column(
@@ -537,7 +656,17 @@ class _ChatScreenState extends State<ChatScreen> {
           )
         ],
       ),
-      floatingActionButton: CustomButton(),
+      // floatingActionButton: CustomButton(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(SearchUser());
+        },
+        child: SvgPicture.asset(
+          'assets/user/prs.svg',
+          color: Colors.white,
+        ),
+        backgroundColor: Color(0xFF0BAB0D),
+      ),
     );
   }
 

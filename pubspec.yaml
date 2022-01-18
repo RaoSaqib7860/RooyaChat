@@ -64,7 +64,7 @@ dependencies:
   intl: ^0.17.0
   video_player: ^2.2.11
   visibility_detector: ^0.2.2
-  focused_menu: ^1.0.5
+  #focused_menu: ^1.0.5
   swipe_to: ^0.1.0-nullsafety.1
 
 dev_dependencies:
