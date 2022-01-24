@@ -45,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -58,8 +57,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     headerSliverBuilder: (context, isScrool) {
                       return [
                         SliverAppBar(
-                          automaticallyImplyLeading: false,elevation: 0,
-                          collapsedHeight: height * 0.110,backgroundColor: Colors.white,
+                          automaticallyImplyLeading: false,
+                          elevation: 0,
+                          collapsedHeight: height * 0.110,
+                          backgroundColor: Colors.white,
                           expandedHeight: height * 0.110,
                           flexibleSpace: MySliver(),
                         ),
@@ -82,11 +83,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                       });
                                     },
                                     child: Container(
-                                      //height: 60,
                                       width: 63.3,
                                       child: Center(
                                           child: SvgPicture.asset(
                                               iconList[index],
+                                              height: 20,
+                                              width: 20,
                                               fit: BoxFit.fill,
                                               color: selectController
                                                           .listofBool[index] ==
@@ -96,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(3),
-                                          color:  Colors.white),
+                                          color: Colors.white),
                                     ),
                                   ),
                                 );

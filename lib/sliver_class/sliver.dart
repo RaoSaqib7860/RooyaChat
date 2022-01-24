@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:rooya/ApiConfig/ApiUtils.dart';
 import 'package:rooya/ClickController/SelectIndexController.dart';
 import 'package:rooya/SearchUser/SearchUser.dart';
+import 'package:rooya/Settings/Settings.dart';
 import 'package:rooya/User/user_chat_information.dart';
 import 'package:rooya/text_filed/app_font.dart';
 
@@ -67,7 +68,9 @@ class _MySliverState extends State<MySliver> {
                         size: 23,
                       )),
                   InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Get.to(Settings());
+                      },
                       child: Container(
                         height: 20,
                         width: 20,

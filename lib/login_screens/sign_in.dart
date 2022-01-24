@@ -99,11 +99,15 @@ class _SignInState extends State<SignIn> {
                             if (controller
                                 .mPasswordController.text.isNotEmpty) {
                               controller.isLoading.value = true;
+                              print({
+                                "userinfo": controller.mUserInfoController.text,
+                                "userpassword": controller.mPasswordController.text,
+                                "devicetoken": '12345'
+                              });
                               bool value = await ApiUtils.getlogin(map: {
-                                'userEmail':
-                                    controller.mUserInfoController.text,
-                                'userPassword':
-                                    controller.mPasswordController.text
+                                "userinfo": controller.mUserInfoController.text,
+                                "userpassword": controller.mPasswordController.text,
+                                "devicetoken": '12345'
                               });
                               controller.isLoading.value = false;
                               if (value) {
@@ -174,29 +178,29 @@ class _SignInState extends State<SignIn> {
                       SizedBox(
                         height: 3.0.h,
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'or join with',
-                            style: TextStyle(
-                              fontFamily: AppFonts.segoeui,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff000000),
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                          SizedBox(
-                            width: 5.0.w,
-                          ),
-                          SvgPicture.asset('assets/fb.svg'),
-                          SizedBox(
-                            width: 5.0.w,
-                          ),
-                          SvgPicture.asset('assets/google.svg'),
-                        ],
-                      )
+                      // Row(
+                      //   mainAxisSize: MainAxisSize.min,
+                      //   children: [
+                      //     Text(
+                      //       'or join with',
+                      //       style: TextStyle(
+                      //         fontFamily: AppFonts.segoeui,
+                      //         fontSize: 16,
+                      //         fontWeight: FontWeight.bold,
+                      //         color: const Color(0xff000000),
+                      //       ),
+                      //       textAlign: TextAlign.left,
+                      //     ),
+                      //     SizedBox(
+                      //       width: 5.0.w,
+                      //     ),
+                      //     SvgPicture.asset('assets/fb.svg'),
+                      //     SizedBox(
+                      //       width: 5.0.w,
+                      //     ),
+                      //     SvgPicture.asset('assets/google.svg'),
+                      //   ],
+                      // )
                     ],
                   ),
                 ),

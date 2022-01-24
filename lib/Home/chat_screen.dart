@@ -15,6 +15,7 @@ import 'package:rooya/PluginComponents/FocusedMenu/focused_menu.dart';
 import 'package:rooya/PluginComponents/FocusedMenu/modals.dart';
 import 'package:rooya/Providers/ChatScreenProvider.dart';
 import 'package:rooya/Request/chat_request.dart';
+import 'package:rooya/SearchUser/NewUserSearchPage.dart';
 import 'package:rooya/SearchUser/SearchUser.dart';
 import 'package:rooya/responsive/primary_color.dart';
 import 'package:rooya/slidable/expendiable.dart';
@@ -99,7 +100,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                     'g_id': listOfSelectedMember[i]
                                         .groupId
                                         .toString(),
-                                    'userId': listOfSelectedMember[i].senderId.toString()
+                                    'userId': listOfSelectedMember[i]
+                                        .senderId
+                                        .toString()
                                   };
                                   ApiUtils.removeGroupApi(map: payLoad);
                                   controller.listofMember
@@ -273,34 +276,76 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                             child: Column(
                               children: [
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    listOfSelectedMember.isNotEmpty
-                                        ? !listOfSelectedMember.contains(
-                                                controller.listofMember[index])
-                                            ? Container(
-                                                height: 20,
-                                                width: 20,
-                                                decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(
-                                                        width: 1,
-                                                        color: buttonColor)),
-                                              )
-                                            : Container(
-                                                height: 20,
-                                                width: 20,
-                                                child: Icon(
-                                                  Icons.check_circle,
-                                                  color: buttonColor,
-                                                ),
-                                              )
-                                        : SizedBox(),
-                                    Expanded(
-                                      child: InkWell(
+                                InkWell(
+                                  onTap: () {
+                                    if (listOfSelectedMember.isEmpty) {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (c) => OneToOneChat(
+                                                    groupID: controller
+                                                        .listofMember[index]
+                                                        .groupId
+                                                        .toString(),
+                                                    name: "${controller.listofMember[index].members![0].firstName} " +
+                                                        "${controller.listofMember[index].members![0].lastName}",
+                                                    profilePic:
+                                                        "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                  ))).then((value) async {
+                                        await controller.getGroupList();
+                                        setState(() {});
+                                      });
+                                    } else {
+                                      if (!listOfSelectedMember.contains(
+                                          controller.listofMember[index])) {
+                                        listOfSelectedMember.add(
+                                            controller.listofMember[index]);
+                                      } else {
+                                        listOfSelectedMember.remove(
+                                            controller.listofMember[index]);
+                                      }
+                                      setState(() {});
+                                    }
+                                  },
+                                  onLongPress: () {
+                                    if (!listOfSelectedMember.contains(
+                                        controller.listofMember[index])) {
+                                      listOfSelectedMember
+                                          .add(controller.listofMember[index]);
+                                    } else {
+                                      listOfSelectedMember.remove(
+                                          controller.listofMember[index]);
+                                    }
+                                    setState(() {});
+                                  },
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      listOfSelectedMember.isNotEmpty
+                                          ? !listOfSelectedMember.contains(
+                                                  controller
+                                                      .listofMember[index])
+                                              ? Container(
+                                                  height: 20,
+                                                  width: 20,
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                          width: 1,
+                                                          color: buttonColor)),
+                                                )
+                                              : Container(
+                                                  height: 20,
+                                                  width: 20,
+                                                  child: Icon(
+                                                    Icons.check_circle,
+                                                    color: buttonColor,
+                                                  ),
+                                                )
+                                          : SizedBox(),
+                                      Expanded(
                                         child: ListTile(
                                           leading: CircularProfileAvatar(
                                             '',
@@ -315,12 +360,18 @@ class _ChatScreenState extends State<ChatScreen> {
                                                       Icon(Icons.error),
                                               fit: BoxFit.cover,
                                             ),
-                                            onTap: () {
-                                              Get.to(Photo_View_Class(
-                                                url:
-                                                    "${controller.listofMember[index].members![0].profilePictureUrl}",
-                                              ));
-                                            },
+                                            onTap: listOfSelectedMember
+                                                    .isNotEmpty
+                                                ? null
+                                                : () {
+                                                    if (listOfSelectedMember
+                                                        .isEmpty) {
+                                                      Get.to(Photo_View_Class(
+                                                        url:
+                                                            "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                      ));
+                                                    }
+                                                  },
                                             imageFit: BoxFit.cover,
                                           ),
                                           title: Text(
@@ -384,55 +435,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                             ],
                                           ),
                                         ),
-                                        onTap: () {
-                                          if (listOfSelectedMember.isEmpty) {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (c) =>
-                                                        OneToOneChat(
-                                                          groupID: controller
-                                                              .listofMember[
-                                                                  index]
-                                                              .groupId
-                                                              .toString(),
-                                                          name: "${controller.listofMember[index].members![0].firstName} " +
-                                                              "${controller.listofMember[index].members![0].lastName}",
-                                                          profilePic:
-                                                              "${controller.listofMember[index].members![0].profilePictureUrl}",
-                                                        ))).then((value) async {
-                                              await controller.getGroupList();
-                                              setState(() {});
-                                            });
-                                          } else {
-                                            if (!listOfSelectedMember.contains(
-                                                controller
-                                                    .listofMember[index])) {
-                                              listOfSelectedMember.add(
-                                                  controller
-                                                      .listofMember[index]);
-                                            } else {
-                                              listOfSelectedMember.remove(
-                                                  controller
-                                                      .listofMember[index]);
-                                            }
-                                            setState(() {});
-                                          }
-                                        },
-                                        onLongPress: () {
-                                          if (!listOfSelectedMember.contains(
-                                              controller.listofMember[index])) {
-                                            listOfSelectedMember.add(
-                                                controller.listofMember[index]);
-                                          } else {
-                                            listOfSelectedMember.remove(
-                                                controller.listofMember[index]);
-                                          }
-                                          setState(() {});
-                                        },
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                                 Container(
                                   height: 1,
@@ -659,7 +664,7 @@ class _ChatScreenState extends State<ChatScreen> {
       // floatingActionButton: CustomButton(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.to(SearchUser());
+          Get.to(NewUserSearchpage());
         },
         child: SvgPicture.asset(
           'assets/user/prs.svg',

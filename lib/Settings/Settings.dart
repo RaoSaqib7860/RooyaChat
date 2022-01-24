@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:rooya/ApiConfig/ApiUtils.dart';
+import 'package:rooya/login_screens/sign_in_tabs_handle.dart';
 import 'package:rooya/responsive/primary_color.dart';
 import 'package:rooya/text_filed/app_font.dart';
 import 'ChangePassword/ChangePassword.dart';
@@ -172,7 +174,7 @@ class _SettingsState extends State<Settings> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                   ),
                   decoration: BoxDecoration(
-                      color: settingGreyColor,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(5)),
                 ),
                 settingRow(
@@ -180,54 +182,54 @@ class _SettingsState extends State<Settings> {
                     height: height,
                     title: 'INVITE FRIENDS',
                     svgname: 'assets/setting/svg/inviteFriends.svg'),
-                Container(
-                  height: height * 0.060,
-                  margin: EdgeInsets.only(bottom: height * 0.015),
-                  width: width,
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.030),
-                  child: Row(
-                    children: [
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: width * 0.1,
-                            child: SvgPicture.asset(
-                              'assets/setting/svg/notifications.svg',
-                              color: darkoffBlackColor,
-                            ),
-                          ),
-                          SizedBox(
-                            width: width * 0.030,
-                          ),
-                          Text(
-                            'CONTACT US',
-                            style: TextStyle(
-                                fontSize: 12.5,
-                                fontFamily: AppFonts.segoeui,
-                                color: darkoffBlackColor),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        child: Text(
-                          'Chat',
-                          style: TextStyle(color: Colors.white, fontSize: 11),
-                        ),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: greenColor,
-                        ),
-                      )
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                  ),
-                  decoration: BoxDecoration(
-                      color: settingGreyColor,
-                      borderRadius: BorderRadius.circular(5)),
-                ),
+                // Container(
+                //   height: height * 0.060,
+                //   margin: EdgeInsets.only(bottom: height * 0.015),
+                //   width: width,
+                //   padding: EdgeInsets.symmetric(horizontal: width * 0.030),
+                //   child: Row(
+                //     children: [
+                //       Row(
+                //         children: [
+                //           SizedBox(
+                //             width: width * 0.1,
+                //             child: SvgPicture.asset(
+                //               'assets/setting/svg/notifications.svg',
+                //               color: darkoffBlackColor,
+                //             ),
+                //           ),
+                //           SizedBox(
+                //             width: width * 0.030,
+                //           ),
+                //           Text(
+                //             'CONTACT US',
+                //             style: TextStyle(
+                //                 fontSize: 12.5,
+                //                 fontFamily: AppFonts.segoeui,
+                //                 color: Colors.white),
+                //           ),
+                //         ],
+                //       ),
+                //       Container(
+                //         child: Text(
+                //           'Chat',
+                //           style: TextStyle(color: Colors.white, fontSize: 11),
+                //         ),
+                //         padding:
+                //             EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                //         decoration: BoxDecoration(
+                //           borderRadius: BorderRadius.circular(20),
+                //           color: greenColor,
+                //         ),
+                //       )
+                //     ],
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     crossAxisAlignment: CrossAxisAlignment.center,
+                //   ),
+                //   decoration: BoxDecoration(
+                //       color: settingGreyColor,
+                //       borderRadius: BorderRadius.circular(5)),
+                // ),
                 settingRow(
                     width: width,
                     height: height,
@@ -258,6 +260,17 @@ class _SettingsState extends State<Settings> {
                     width: width,
                     title: 'DELETE ACCOUNT',
                     textColor: Color(0xffEC2B17)),
+                InkWell(
+                  onTap: () {
+                    storage.erase();
+                    Get.offAll(SignInTabsHandle());
+                  },
+                  child: seetingRowWithOutIcon(
+                      height: height,
+                      width: width,
+                      title: 'Logout',
+                      textColor: Color(0xffEC2B17)),
+                ),
                 SizedBox(
                   height: height * 0.020,
                 ),

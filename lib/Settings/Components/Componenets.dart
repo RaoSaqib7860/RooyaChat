@@ -44,7 +44,7 @@ Widget settingRow(
       crossAxisAlignment: CrossAxisAlignment.center,
     ),
     decoration: BoxDecoration(
-        color: settingGreyColor, borderRadius: BorderRadius.circular(5)),
+        color: Colors.white, borderRadius: BorderRadius.circular(5)),
   );
 }
 
@@ -84,7 +84,7 @@ Widget seetingRowWithOutIcon(
       crossAxisAlignment: CrossAxisAlignment.center,
     ),
     decoration: BoxDecoration(
-        color: settingGreyColor, borderRadius: BorderRadius.circular(5)),
+        color: Colors.white, borderRadius: BorderRadius.circular(5)),
   );
 }
 

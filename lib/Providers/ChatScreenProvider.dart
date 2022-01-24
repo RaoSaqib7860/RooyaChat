@@ -16,7 +16,8 @@ class ChatScreenProvider extends GetxController {
   }
 
   Socket? socket;
-  String alreadyOpenGroup='';
+  String alreadyOpenGroup = '';
+
   connectToSocket() {
     try {
       socket = io(
@@ -40,8 +41,11 @@ class ChatScreenProvider extends GetxController {
           UpcomingMessageModel model =
               UpcomingMessageModel.fromJson(jsonDecode(value));
           await getGroupList();
-          if (model.groupData!.recentMessage == 'You: ' && alreadyOpenGroup!=model.groupData!.groupId.toString() && openSearch) {
-            alreadyOpenGroup=model.groupData!.groupId.toString();
+          if (model.groupData!.recentMessage == 'You: ' &&
+              alreadyOpenGroup != model.groupData!.groupId.toString() &&
+              openSearch) {
+            alreadyOpenGroup = model.groupData!.groupId.toString();
+            Navigator.of(Get.context!).pop();
             Navigator.push(
                 Get.context!,
                 MaterialPageRoute(
@@ -51,8 +55,7 @@ class ChatScreenProvider extends GetxController {
                               "${model.groupData!.members![0].lastName}",
                           profilePic:
                               "${model.groupData!.members![0].profilePictureUrl}",
-                        ))).then((value) async {
-            });
+                        ))).then((value) async {});
           }
           await getGroupList();
         });
