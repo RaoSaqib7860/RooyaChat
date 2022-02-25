@@ -7,7 +7,7 @@ import 'package:rooya/ApiConfig/ApiUtils.dart';
 import 'package:rooya/ClickController/SelectIndexController.dart';
 import 'package:rooya/SearchUser/SearchUser.dart';
 import 'package:rooya/Settings/Settings.dart';
-import 'package:rooya/User/user_chat_information.dart';
+import 'package:rooya/User/UserChatInformation/user_chat_information.dart';
 import 'package:rooya/text_filed/app_font.dart';
 
 class MySliver extends StatefulWidget {
@@ -34,7 +34,7 @@ class _MySliverState extends State<MySliver> {
           ListTile(
               leading: CircularProfileAvatar(
                 storage.read('profile') ==
-                        'https://chat.rooyatech.com/assets/userImage/'
+                        'https://cc.rooyatech.com/assets/userImage/'
                     ? '${storage.read('profile')}notfound.png'
                     : '${storage.read('profile')}',
                 radius: 18,

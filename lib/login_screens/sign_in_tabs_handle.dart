@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rooya/Home/home_screen.dart';
 import 'package:rooya/login_screens/sign_in.dart';
 import 'package:rooya/login_screens/sign_up.dart';
@@ -15,11 +16,24 @@ class SignInTabsHandle extends StatefulWidget {
 class _SignInTabsHandleState extends State<SignInTabsHandle>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
-
   @override
   void initState() {
     super.initState();
     _tabController = new TabController(vsync: this, length: 2);
+    getPermission();
+  }
+
+  getPermission() async {
+    await [
+      Permission.location,
+      Permission.storage,
+      Permission.camera,
+      Permission.contacts,
+      Permission.manageExternalStorage,
+      Permission.photos,
+      Permission.mediaLibrary,
+      Permission.accessMediaLocation,
+    ].request();
   }
 
   @override

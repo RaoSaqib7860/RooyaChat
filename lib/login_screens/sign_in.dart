@@ -99,15 +99,14 @@ class _SignInState extends State<SignIn> {
                             if (controller
                                 .mPasswordController.text.isNotEmpty) {
                               controller.isLoading.value = true;
-                              print({
-                                "userinfo": controller.mUserInfoController.text,
-                                "userpassword": controller.mPasswordController.text,
-                                "devicetoken": '12345'
-                              });
                               bool value = await ApiUtils.getlogin(map: {
-                                "userinfo": controller.mUserInfoController.text,
-                                "userpassword": controller.mPasswordController.text,
-                                "devicetoken": '12345'
+                                "userEmail": controller.mUserInfoController.text
+                                    .trim()
+                                    .toString(),
+                                "userPassword": controller
+                                    .mPasswordController.text
+                                    .trim()
+                                    .toString()
                               });
                               controller.isLoading.value = false;
                               if (value) {

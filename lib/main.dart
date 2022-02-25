@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:socket_io/socket_io.dart';
@@ -36,7 +35,7 @@ void main() async {
       client.emit('fromServer', "ok");
     });
   });
-  io.listen(3003);
+  io.listen(4499);
   await GetStorage.init();
   runApp(MyApp());
 }
@@ -48,7 +47,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Sizer(builder: (context, orientation, deviceType) {
       return GetMaterialApp(
-        title: 'Rooya Chat',
+        title: 'Mersaal',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),

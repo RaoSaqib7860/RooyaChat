@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:open_file/open_file.dart';
@@ -12,30 +13,41 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:record_mp3/record_mp3.dart';
 import 'package:rooya/ApiConfig/ApiUtils.dart';
+import 'package:rooya/GlobalWidget/Contacts/GetAllContactsPage.dart';
 import 'package:rooya/GlobalWidget/CustomAudioPlayer/CustomAudioPlayer.dart';
+import 'package:rooya/GlobalWidget/GoogleMapView.dart';
 import 'package:rooya/Providers/OneToOneChatProvider.dart';
 import 'package:rooya/responsive/primary_color.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'GlobalWidget/Contacts/ContactView.dart';
 import 'GlobalWidget/CustomVideoPlayer.dart';
 import 'package:record/record.dart' as record;
 import 'GlobalWidget/FileUploader.dart';
+import 'GlobalWidget/MapsClass.dart';
 import 'GlobalWidget/MarqueWidget.dart';
 import 'package:path/path.dart' as p;
 import 'package:intl/intl.dart';
 import 'GlobalWidget/MessageInformationDailog.dart';
 import 'GlobalWidget/Photo_View_Class.dart';
+import 'GlobalWidget/SnackBarApp.dart';
 import 'PluginComponents/FocusedMenu/focused_menu.dart';
 import 'PluginComponents/FocusedMenu/modals.dart';
 import 'Providers/OneToOneModel.dart';
-import 'User/user_chat_information.dart';
+import 'User/UserChatInformation/user_chat_information.dart';
 
 class OneToOneChat extends StatefulWidget {
   final String? groupID;
   final String? profilePic;
   final String? name;
+  final bool? fromGroup;
 
-  const OneToOneChat({Key? key, this.groupID, this.profilePic, this.name})
+  const OneToOneChat(
+      {Key? key,
+      this.groupID,
+      this.profilePic,
+      this.name,
+      this.fromGroup = false})
       : super(key: key);
 
   @override
@@ -238,7 +250,12 @@ class _OneToOneChatState extends State<OneToOneChat> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    Get.to(UserChatInformation());
+                                    Get.to(UserChatInformation(
+                                      groupID: widget.groupID,
+                                    ))!
+                                        .then((value) {
+                                      Navigator.of(context).pop();
+                                    });
                                   },
                                   child: Text(
                                     '${widget.name}',
@@ -462,211 +479,313 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                                                       true,
                                                                   child: Column(
                                                                     children: [
-                                                                      extension.contains('.jpg') ||
-                                                                              extension.contains('.png') ||
-                                                                              extension.contains('.jpeg')
-                                                                          ? InkWell(
-                                                                              child: Container(
-                                                                                height: height * 0.3,
-                                                                                child: Stack(
-                                                                                  children: [
-                                                                                    Container(
-                                                                                      height: height * 0.3,
-                                                                                      child: ClipRRect(
-                                                                                        child: CachedNetworkImage(
-                                                                                          fit: BoxFit.cover,
-                                                                                          imageUrl: "${getcontroller!.oneToOneChat[i].message!.message}",
-                                                                                          placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                                                                                          errorWidget: (context, url, error) => Icon(Icons.error),
-                                                                                        ),
-                                                                                        borderRadius: BorderRadius.circular(8),
+                                                                      '${getcontroller!.oneToOneChat[i].message!.message}'.contains(
+                                                                              'Contacts#=-:')
+                                                                          ? Builder(builder:
+                                                                              (context) {
+                                                                              List list = '${getcontroller!.oneToOneChat[i].message!.message}'.split(':');
+                                                                              return ContactView(
+                                                                                result: list[1],
+                                                                              );
+                                                                            })
+                                                                          : '${getcontroller!.oneToOneChat[i].message!.message}'.contains('latitude') && '${getcontroller!.oneToOneChat[i].message!.message}'.contains('longitude')
+                                                                              ? Builder(builder: (context) {
+                                                                                  List list = '${getcontroller!.oneToOneChat[i].message!.message}'.split(',');
+                                                                                  return ClipRRect(
+                                                                                    borderRadius: BorderRadius.circular(5),
+                                                                                    child: Container(
+                                                                                      width: width,
+                                                                                      height: height * 0.210,
+                                                                                      padding: EdgeInsets.all(3),
+                                                                                      decoration: BoxDecoration(color: Colors.blueGrey[50]),
+                                                                                      child: GoogleMapView(
+                                                                                        lat: list[0].toString().split(':')[1],
+                                                                                        lng: list[1].toString().split(':')[1],
+                                                                                        ontap: () async {
+                                                                                          print('Clicked on map');
+                                                                                          Position? position = await Geolocator.getLastKnownPosition();
+                                                                                          launchURL('https://www.google.com/maps/dir/?api=1&origin=${position!.latitude},${position.longitude}&destination=${list[0].toString().split(':')[1]},${list[1].toString().split(':')[1]}&travelmode=driving&dir_action=navigate');
+                                                                                        },
                                                                                       ),
                                                                                     ),
-                                                                                    Align(
-                                                                                      child: Padding(
-                                                                                        padding: const EdgeInsets.all(8.0),
-                                                                                        child: Text(
-                                                                                          '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
-                                                                                          style: TextStyle(
-                                                                                            color: Colors.white60,
-                                                                                            fontSize: 9.0,
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                      alignment: Alignment.bottomRight,
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              onTap: () {
-                                                                                Get.to(Photo_View_Class(
-                                                                                  url: "${getcontroller!.oneToOneChat[i].message!.message}",
-                                                                                ));
-                                                                              },
-                                                                            )
-                                                                          : extension.contains('.mp4') || extension.contains('.mov') || extension.contains('.avi') || extension.contains('.mpeg4') || extension.contains('.flv') || extension.contains('.3gp') || extension.contains('.mov')
-                                                                              ? InkWell(
-                                                                                  child: Container(
-                                                                                    width: width / 1.7,
-                                                                                    height: height * 0.3,
-                                                                                    child: Stack(
-                                                                                      children: [
-                                                                                        Container(
-                                                                                          width: width / 1.7,
-                                                                                          height: height * 0.3,
-                                                                                          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(5)),
-                                                                                          child: Center(
-                                                                                            child: Icon(
-                                                                                              Icons.play_circle_fill,
-                                                                                              size: 40,
-                                                                                              color: Colors.white,
-                                                                                            ),
-                                                                                          ),
-                                                                                        ),
-                                                                                        Align(
-                                                                                          child: Padding(
-                                                                                            padding: const EdgeInsets.all(8.0),
-                                                                                            child: Text(
-                                                                                              '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
-                                                                                              style: TextStyle(
-                                                                                                color: Colors.white60,
-                                                                                                fontSize: 9.0,
-                                                                                              ),
-                                                                                            ),
-                                                                                          ),
-                                                                                          alignment: Alignment.bottomRight,
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  ),
-                                                                                  onTap: () {
-                                                                                    Get.to(CustomVideoPlayer(
-                                                                                      url: getcontroller!.oneToOneChat[i].message!.message,
-                                                                                    ));
-                                                                                    // Get.to(
-                                                                                    //     VideoApp(
-                                                                                    //   assetsPath:
-                                                                                    //       '${getcontroller!.oneToOneChat[i].message!.message}',
-                                                                                    // ));
-                                                                                  },
-                                                                                )
-                                                                              : extension.contains('.mp3') || extension.contains('.aac') || extension.contains('.ac3') || extension.contains('.h264') || extension.contains('.wav') || extension.contains('.csv') || extension.contains('.wma') || extension.contains('.wmv')
-                                                                                  ? Container(
-                                                                                      height: height * 0.1,
-                                                                                      width: width / 1.7,
-                                                                                      child: Column(
-                                                                                        children: [
-                                                                                          Container(
-                                                                                            height: height * 0.080,
-                                                                                            width: width / 1.7,
-                                                                                            child: CustomAudioPlayer(
-                                                                                              url: getcontroller!.oneToOneChat[i].message!.message,
-                                                                                            ),
-                                                                                          ),
-                                                                                          Align(
-                                                                                            child: Text(
-                                                                                              '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
-                                                                                              style: TextStyle(
-                                                                                                color: Colors.black26,
-                                                                                                fontSize: 9.0,
-                                                                                              ),
-                                                                                            ),
-                                                                                            alignment: Alignment.centerRight,
-                                                                                          ),
-                                                                                        ],
-                                                                                      ),
-                                                                                    )
-                                                                                  : extension.contains('.pdf') || extension.contains('.docx') || extension.contains('.doc') || extension.contains('.xlsx') || extension.contains('.xls') || extension.contains('.ppt') || extension.contains('.pptx') || extension.contains('.ppm') || extension.contains('.zip') || extension.contains('.rar')
-                                                                                      ? InkWell(
-                                                                                          child: Container(
-                                                                                            padding: EdgeInsets.all(5),
-                                                                                            width: width / 3,
-                                                                                            child: Column(
+                                                                                  );
+                                                                                })
+                                                                              : extension.contains('.jpg') || extension.contains('.png') || extension.contains('.jpeg')
+                                                                                  ? InkWell(
+                                                                                      child: Container(
+                                                                                        height: height * 0.3,
+                                                                                        child: Stack(
+                                                                                          children: [
+                                                                                            Column(
                                                                                               children: [
-                                                                                                Icon(
-                                                                                                  Icons.file_copy_outlined,
-                                                                                                  size: 40,
-                                                                                                  color: primaryColor,
-                                                                                                ),
-                                                                                                SizedBox(
-                                                                                                  height: 5,
-                                                                                                ),
-                                                                                                Padding(
-                                                                                                  padding: EdgeInsets.symmetric(horizontal: 10),
-                                                                                                  child: Text(
-                                                                                                    p
-                                                                                                        .basename(
-                                                                                                          '${getcontroller!.oneToOneChat[i].message!.message}',
-                                                                                                        )
-                                                                                                        .split('=')[2]
-                                                                                                        .toString(),
-                                                                                                    style: TextStyle(fontSize: 10),
-                                                                                                    maxLines: 10,
-                                                                                                    overflow: TextOverflow.ellipsis,
-                                                                                                  ),
-                                                                                                ),
-                                                                                                SizedBox(
-                                                                                                  height: 5,
-                                                                                                ),
-                                                                                                Align(
-                                                                                                  child: Text(
-                                                                                                    '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
-                                                                                                    style: TextStyle(
-                                                                                                      color: Colors.black26,
-                                                                                                      fontSize: 9.0,
+                                                                                                widget.fromGroup!
+                                                                                                    ? Column(
+                                                                                                        children: [
+                                                                                                          Text(
+                                                                                                            '${getcontroller!.oneToOneChat[i].sender!.firstName}' '${getcontroller!.oneToOneChat[i].sender!.lastName}',
+                                                                                                            style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold, fontSize: 12),
+                                                                                                          ),
+                                                                                                          SizedBox(
+                                                                                                            height: height / 100,
+                                                                                                          ),
+                                                                                                        ],
+                                                                                                      )
+                                                                                                    : SizedBox(),
+                                                                                                Container(
+                                                                                                  height: height * 0.3,
+                                                                                                  child: ClipRRect(
+                                                                                                    child: CachedNetworkImage(
+                                                                                                      fit: BoxFit.cover,
+                                                                                                      imageUrl: "${getcontroller!.oneToOneChat[i].message!.message}",
+                                                                                                      placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                                                                                                      errorWidget: (context, url, error) => Icon(Icons.error),
                                                                                                     ),
+                                                                                                    borderRadius: BorderRadius.circular(8),
                                                                                                   ),
-                                                                                                  alignment: Alignment.centerRight,
                                                                                                 ),
                                                                                               ],
-                                                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                                                              crossAxisAlignment: CrossAxisAlignment.center,
                                                                                             ),
-                                                                                            decoration: BoxDecoration(
-                                                                                                border: Border.all(
-                                                                                                  width: 1,
-                                                                                                  color: Colors.black12,
+                                                                                            Align(
+                                                                                              child: Padding(
+                                                                                                padding: const EdgeInsets.all(8.0),
+                                                                                                child: Text(
+                                                                                                  '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
+                                                                                                  style: TextStyle(
+                                                                                                    color: Colors.white60,
+                                                                                                    fontSize: 9.0,
+                                                                                                  ),
                                                                                                 ),
-                                                                                                borderRadius: BorderRadius.circular(10)),
+                                                                                              ),
+                                                                                              alignment: Alignment.bottomRight,
+                                                                                            ),
+                                                                                          ],
+                                                                                        ),
+                                                                                      ),
+                                                                                      onTap: () {
+                                                                                        Get.to(Photo_View_Class(
+                                                                                          url: "${getcontroller!.oneToOneChat[i].message!.message}",
+                                                                                        ));
+                                                                                      },
+                                                                                    )
+                                                                                  : extension.contains('.mp4') || extension.contains('.mov') || extension.contains('.avi') || extension.contains('.mpeg4') || extension.contains('.flv') || extension.contains('.3gp') || extension.contains('.mov')
+                                                                                      ? InkWell(
+                                                                                          child: Container(
+                                                                                            width: width / 1.7,
+                                                                                            height: height * 0.3,
+                                                                                            child: Stack(
+                                                                                              children: [
+                                                                                                Column(
+                                                                                                  children: [
+                                                                                                    widget.fromGroup!
+                                                                                                        ? Column(
+                                                                                                            children: [
+                                                                                                              Text(
+                                                                                                                '${getcontroller!.oneToOneChat[i].sender!.firstName}' '${getcontroller!.oneToOneChat[i].sender!.lastName}',
+                                                                                                                style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold, fontSize: 12),
+                                                                                                              ),
+                                                                                                              SizedBox(
+                                                                                                                height: height / 100,
+                                                                                                              ),
+                                                                                                            ],
+                                                                                                          )
+                                                                                                        : SizedBox(),
+                                                                                                    Container(
+                                                                                                      width: width / 1.7,
+                                                                                                      height: height * 0.3,
+                                                                                                      decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(5)),
+                                                                                                      child: Center(
+                                                                                                        child: Icon(
+                                                                                                          Icons.play_circle_fill,
+                                                                                                          size: 40,
+                                                                                                          color: Colors.white,
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                  ],
+                                                                                                ),
+                                                                                                Align(
+                                                                                                  child: Padding(
+                                                                                                    padding: const EdgeInsets.all(8.0),
+                                                                                                    child: Text(
+                                                                                                      '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
+                                                                                                      style: TextStyle(
+                                                                                                        color: Colors.white60,
+                                                                                                        fontSize: 9.0,
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                  alignment: Alignment.bottomRight,
+                                                                                                ),
+                                                                                              ],
+                                                                                            ),
                                                                                           ),
-                                                                                          onTap: () async {
-                                                                                            String filePath = await saveAudioFile(url: '${getcontroller!.oneToOneChat[i].message!.message}', extension: extension, fileNName: p.basename('${getcontroller!.oneToOneChat[i].message!.message}'));
-                                                                                            await OpenFile.open(filePath);
+                                                                                          onTap: () {
+                                                                                            Get.to(CustomVideoPlayer(
+                                                                                              url: getcontroller!.oneToOneChat[i].message!.message,
+                                                                                            ));
+                                                                                            // Get.to(
+                                                                                            //     VideoApp(
+                                                                                            //   assetsPath:
+                                                                                            //       '${getcontroller!.oneToOneChat[i].message!.message}',
+                                                                                            // ));
                                                                                           },
                                                                                         )
-                                                                                      : Container(
-                                                                                          padding: EdgeInsets.all(width / 30),
-                                                                                          decoration: BoxDecoration(color: Color(0xffF3F3F3), borderRadius: BorderRadius.circular(8)),
-                                                                                          child: Column(
-                                                                                            children: [
-                                                                                              Text(
-                                                                                                '${getcontroller!.oneToOneChat[i].message!.message}',
-                                                                                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300, fontSize: 14),
-                                                                                              ),
-                                                                                              SizedBox(
-                                                                                                height: height / 100,
-                                                                                              ),
-                                                                                              Row(
-                                                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                                                children: <Widget>[
-                                                                                                  Padding(
-                                                                                                    padding: EdgeInsets.only(left: width / 50),
+                                                                                      : extension.contains('.mp3') || extension.contains('.aac') || extension.contains('.ac3') || extension.contains('.h264') || extension.contains('.wav') || extension.contains('.csv') || extension.contains('.wma') || extension.contains('.wmv')
+                                                                                          ? Container(
+                                                                                              height: height * 0.1,
+                                                                                              width: width / 1.7,
+                                                                                              child: Column(
+                                                                                                children: [
+                                                                                                  widget.fromGroup!
+                                                                                                      ? Column(
+                                                                                                          children: [
+                                                                                                            Text(
+                                                                                                              '${getcontroller!.oneToOneChat[i].sender!.firstName}' '${getcontroller!.oneToOneChat[i].sender!.lastName}',
+                                                                                                              style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold, fontSize: 12),
+                                                                                                            ),
+                                                                                                            SizedBox(
+                                                                                                              height: height / 100,
+                                                                                                            ),
+                                                                                                          ],
+                                                                                                        )
+                                                                                                      : SizedBox(),
+                                                                                                  Container(
+                                                                                                    height: height * 0.080,
+                                                                                                    width: width / 1.7,
+                                                                                                    child: CustomAudioPlayer(
+                                                                                                      url: getcontroller!.oneToOneChat[i].message!.message,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                  Align(
                                                                                                     child: Text(
-                                                                                                      //  '${timeago.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}"), locale: 'en_short')} ago',
-                                                                                                      //${DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").day} ${DateFormat.yMMM().format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}")).toString().split(' ')[0]} ,
                                                                                                       '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
                                                                                                       style: TextStyle(
                                                                                                         color: Colors.black26,
                                                                                                         fontSize: 9.0,
                                                                                                       ),
                                                                                                     ),
+                                                                                                    alignment: Alignment.centerRight,
                                                                                                   ),
                                                                                                 ],
-                                                                                              )
-                                                                                            ],
-                                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                          ),
-                                                                                        ),
+                                                                                              ),
+                                                                                            )
+                                                                                          : extension.contains('.pdf') || extension.contains('.docx') || extension.contains('.doc') || extension.contains('.xlsx') || extension.contains('.xls') || extension.contains('.ppt') || extension.contains('.pptx') || extension.contains('.ppm') || extension.contains('.zip') || extension.contains('.rar')
+                                                                                              ? InkWell(
+                                                                                                  child: Container(
+                                                                                                    padding: EdgeInsets.all(5),
+                                                                                                    width: width / 3,
+                                                                                                    child: Column(
+                                                                                                      children: [
+                                                                                                        widget.fromGroup!
+                                                                                                            ? Column(
+                                                                                                                children: [
+                                                                                                                  Text(
+                                                                                                                    '${getcontroller!.oneToOneChat[i].sender!.firstName}' '${getcontroller!.oneToOneChat[i].sender!.lastName}',
+                                                                                                                    style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold, fontSize: 12),
+                                                                                                                  ),
+                                                                                                                  SizedBox(
+                                                                                                                    height: height / 100,
+                                                                                                                  ),
+                                                                                                                ],
+                                                                                                              )
+                                                                                                            : SizedBox(),
+                                                                                                        Icon(
+                                                                                                          Icons.file_copy_outlined,
+                                                                                                          size: 40,
+                                                                                                          color: primaryColor,
+                                                                                                        ),
+                                                                                                        SizedBox(
+                                                                                                          height: 5,
+                                                                                                        ),
+                                                                                                        Padding(
+                                                                                                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                                                                                          child: Text(
+                                                                                                            p
+                                                                                                                .basename(
+                                                                                                                  '${getcontroller!.oneToOneChat[i].message!.message}',
+                                                                                                                )
+                                                                                                                .split('=')[2]
+                                                                                                                .toString(),
+                                                                                                            style: TextStyle(fontSize: 10),
+                                                                                                            maxLines: 10,
+                                                                                                            overflow: TextOverflow.ellipsis,
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                        SizedBox(
+                                                                                                          height: 5,
+                                                                                                        ),
+                                                                                                        Align(
+                                                                                                          child: Text(
+                                                                                                            '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
+                                                                                                            style: TextStyle(
+                                                                                                              color: Colors.black26,
+                                                                                                              fontSize: 9.0,
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                          alignment: Alignment.centerRight,
+                                                                                                        ),
+                                                                                                      ],
+                                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                                                                    ),
+                                                                                                    decoration: BoxDecoration(
+                                                                                                        border: Border.all(
+                                                                                                          width: 1,
+                                                                                                          color: Colors.black12,
+                                                                                                        ),
+                                                                                                        borderRadius: BorderRadius.circular(10)),
+                                                                                                  ),
+                                                                                                  onTap: () async {
+                                                                                                    String filePath = await saveAudioFile(url: '${getcontroller!.oneToOneChat[i].message!.message}', extension: extension, fileNName: p.basename('${getcontroller!.oneToOneChat[i].message!.message}'));
+                                                                                                    await OpenFile.open(filePath);
+                                                                                                  },
+                                                                                                )
+                                                                                              : Container(
+                                                                                                  padding: EdgeInsets.all(width / 30),
+                                                                                                  decoration: BoxDecoration(color: Color(0xffF3F3F3), borderRadius: BorderRadius.circular(8)),
+                                                                                                  child: Column(
+                                                                                                    children: [
+                                                                                                      widget.fromGroup!
+                                                                                                          ? Column(
+                                                                                                              children: [
+                                                                                                                Text(
+                                                                                                                  '${getcontroller!.oneToOneChat[i].sender!.firstName}' '${getcontroller!.oneToOneChat[i].sender!.lastName}',
+                                                                                                                  style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold, fontSize: 12),
+                                                                                                                ),
+                                                                                                                SizedBox(
+                                                                                                                  height: height / 100,
+                                                                                                                ),
+                                                                                                              ],
+                                                                                                            )
+                                                                                                          : SizedBox(),
+                                                                                                      Text(
+                                                                                                        '${getcontroller!.oneToOneChat[i].message!.message}',
+                                                                                                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300, fontSize: 14),
+                                                                                                      ),
+                                                                                                      SizedBox(
+                                                                                                        height: height / 100,
+                                                                                                      ),
+                                                                                                      Row(
+                                                                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                                                                        children: <Widget>[
+                                                                                                          Padding(
+                                                                                                            padding: EdgeInsets.only(left: width / 50),
+                                                                                                            child: Text(
+                                                                                                              //  '${timeago.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}"), locale: 'en_short')} ago',
+                                                                                                              //${DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").day} ${DateFormat.yMMM().format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}")).toString().split(' ')[0]} ,
+                                                                                                              '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
+                                                                                                              style: TextStyle(
+                                                                                                                color: Colors.black26,
+                                                                                                                fontSize: 9.0,
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ],
+                                                                                                      )
+                                                                                                    ],
+                                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                  ),
+                                                                                                ),
                                                                       SizedBox(
                                                                         height: height /
                                                                             200,
@@ -858,209 +977,238 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                                                   },
                                                                   child: Column(
                                                                     children: [
-                                                                      extension.contains('.jpg') ||
-                                                                              extension.contains('.png') ||
-                                                                              extension.contains('.jpeg')
-                                                                          ? InkWell(
-                                                                              child: Container(
-                                                                                height: height * 0.3,
-                                                                                child: Stack(
-                                                                                  children: [
-                                                                                    Container(
-                                                                                      height: height * 0.3,
-                                                                                      child: ClipRRect(
-                                                                                        child: CachedNetworkImage(
-                                                                                          imageUrl: "${getcontroller!.oneToOneChat[i].message!.message}",
-                                                                                          placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                                                                                          errorWidget: (context, url, error) => Icon(Icons.error),
-                                                                                        ),
-                                                                                        borderRadius: BorderRadius.circular(8),
+                                                                      '${getcontroller!.oneToOneChat[i].message!.message}'.contains(
+                                                                              'Contacts#=-:')
+                                                                          ? Builder(builder:
+                                                                              (context) {
+                                                                              List list = '${getcontroller!.oneToOneChat[i].message!.message}'.split(':');
+                                                                              return ContactView(
+                                                                                result: list[1],
+                                                                              );
+                                                                            })
+                                                                          : '${getcontroller!.oneToOneChat[i].message!.message}'.contains('latitude') && '${getcontroller!.oneToOneChat[i].message!.message}'.contains('longitude')
+                                                                              ? Builder(builder: (context) {
+                                                                                  List list = '${getcontroller!.oneToOneChat[i].message!.message}'.split(',');
+                                                                                  return ClipRRect(
+                                                                                    borderRadius: BorderRadius.circular(5),
+                                                                                    child: Container(
+                                                                                      width: width,
+                                                                                      height: height * 0.210,
+                                                                                      padding: EdgeInsets.all(3),
+                                                                                      decoration: BoxDecoration(color: Colors.blueGrey[50]),
+                                                                                      child: GoogleMapView(
+                                                                                        lat: list[0].toString().split(':')[1],
+                                                                                        lng: list[1].toString().split(':')[1],
+                                                                                        ontap: () async {
+                                                                                          print('Clicked on map');
+                                                                                          Position? position = await Geolocator.getLastKnownPosition();
+                                                                                          launchURL('https://www.google.com/maps/dir/?api=1&origin=${position!.latitude},${position.longitude}&destination=${list[0].toString().split(':')[1]},${list[1].toString().split(':')[1]}&travelmode=driving&dir_action=navigate');
+                                                                                        },
                                                                                       ),
                                                                                     ),
-                                                                                    Align(
-                                                                                      child: Padding(
-                                                                                        padding: const EdgeInsets.all(8.0),
-                                                                                        child: Text(
-                                                                                          '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
-                                                                                          style: TextStyle(
-                                                                                            color: Colors.white,
-                                                                                            fontSize: 9.0,
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                      alignment: Alignment.bottomRight,
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              onTap: () {
-                                                                                Get.to(Photo_View_Class(
-                                                                                  url: "${getcontroller!.oneToOneChat[i].message!.message}",
-                                                                                ));
-                                                                              },
-                                                                            )
-                                                                          : extension.contains('.mp4')
-                                                                              ? InkWell(
-                                                                                  child: Container(
-                                                                                    width: width / 1.7,
-                                                                                    height: height * 0.3,
-                                                                                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(5)),
-                                                                                    child: Stack(
-                                                                                      children: [
-                                                                                        Center(
-                                                                                          child: Icon(
-                                                                                            Icons.play_circle_fill,
-                                                                                            size: 40,
-                                                                                            color: Colors.white,
-                                                                                          ),
-                                                                                        ),
-                                                                                        Align(
-                                                                                          child: Padding(
-                                                                                            padding: const EdgeInsets.all(8.0),
-                                                                                            child: Text(
-                                                                                              '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
-                                                                                              style: TextStyle(
-                                                                                                color: Colors.white60,
-                                                                                                fontSize: 9.0,
+                                                                                  );
+                                                                                })
+                                                                              : extension.contains('.jpg') || extension.contains('.png') || extension.contains('.jpeg')
+                                                                                  ? InkWell(
+                                                                                      child: Container(
+                                                                                        height: height * 0.3,
+                                                                                        child: Stack(
+                                                                                          children: [
+                                                                                            Container(
+                                                                                              height: height * 0.3,
+                                                                                              child: ClipRRect(
+                                                                                                child: CachedNetworkImage(
+                                                                                                  imageUrl: "${getcontroller!.oneToOneChat[i].message!.message}",
+                                                                                                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                                                                                                  errorWidget: (context, url, error) => Icon(Icons.error),
+                                                                                                ),
+                                                                                                borderRadius: BorderRadius.circular(8),
                                                                                               ),
                                                                                             ),
-                                                                                          ),
-                                                                                          alignment: Alignment.bottomRight,
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  ),
-                                                                                  onTap: () {
-                                                                                    Get.to(CustomVideoPlayer(
-                                                                                      url: getcontroller!.oneToOneChat[i].message!.message,
-                                                                                    ));
-                                                                                    // Get.to(
-                                                                                    //     VideoApp(
-                                                                                    //   assetsPath:
-                                                                                    //       '${getcontroller!.oneToOneChat[i].message!.message}',
-                                                                                    // ));
-                                                                                  },
-                                                                                )
-                                                                              : extension.contains('.mp3') || extension.contains('.aac') || extension.contains('.ac3') || extension.contains('.h264') || extension.contains('.wav') || extension.contains('.csv') || extension.contains('.wma') || extension.contains('.wmv')
-                                                                                  ? Container(
-                                                                                      height: height * 0.1,
-                                                                                      width: width / 1.7,
-                                                                                      child: Stack(
-                                                                                        children: [
-                                                                                          Container(
-                                                                                            height: height * 0.080,
-                                                                                            width: width / 1.7,
-                                                                                            child: CustomAudioPlayer(
-                                                                                              url: getcontroller!.oneToOneChat[i].message!.message,
-                                                                                            ),
-                                                                                          ),
-                                                                                          Align(
-                                                                                            child: Padding(
-                                                                                              padding: const EdgeInsets.all(8.0),
-                                                                                              child: Text(
-                                                                                                '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
-                                                                                                style: TextStyle(
-                                                                                                  color: Colors.black26,
-                                                                                                  fontSize: 9.0,
+                                                                                            Align(
+                                                                                              child: Padding(
+                                                                                                padding: const EdgeInsets.all(8.0),
+                                                                                                child: Text(
+                                                                                                  '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
+                                                                                                  style: TextStyle(
+                                                                                                    color: Colors.white,
+                                                                                                    fontSize: 9.0,
+                                                                                                  ),
                                                                                                 ),
                                                                                               ),
+                                                                                              alignment: Alignment.bottomRight,
                                                                                             ),
-                                                                                            alignment: Alignment.bottomRight,
-                                                                                          ),
-                                                                                        ],
+                                                                                          ],
+                                                                                        ),
                                                                                       ),
+                                                                                      onTap: () {
+                                                                                        Get.to(Photo_View_Class(
+                                                                                          url: "${getcontroller!.oneToOneChat[i].message!.message}",
+                                                                                        ));
+                                                                                      },
                                                                                     )
-                                                                                  : extension.contains('.pdf')
+                                                                                  : extension.contains('.mp4')
                                                                                       ? InkWell(
                                                                                           child: Container(
-                                                                                            padding: EdgeInsets.all(5),
-                                                                                            width: width / 3,
-                                                                                            child: Column(
+                                                                                            width: width / 1.7,
+                                                                                            height: height * 0.3,
+                                                                                            decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(5)),
+                                                                                            child: Stack(
                                                                                               children: [
-                                                                                                Icon(
-                                                                                                  Icons.file_copy_outlined,
-                                                                                                  size: 40,
-                                                                                                  color: primaryColor,
-                                                                                                ),
-                                                                                                SizedBox(
-                                                                                                  height: 5,
-                                                                                                ),
-                                                                                                Padding(
-                                                                                                  padding: EdgeInsets.symmetric(horizontal: 10),
-                                                                                                  child: Text(
-                                                                                                    p
-                                                                                                        .basename(
-                                                                                                          '${getcontroller!.oneToOneChat[i].message!.message}',
-                                                                                                        )
-                                                                                                        .split('=')[2]
-                                                                                                        .toString(),
-                                                                                                    style: TextStyle(fontSize: 10),
-                                                                                                    maxLines: 10,
-                                                                                                    overflow: TextOverflow.ellipsis,
+                                                                                                Center(
+                                                                                                  child: Icon(
+                                                                                                    Icons.play_circle_fill,
+                                                                                                    size: 40,
+                                                                                                    color: Colors.white,
                                                                                                   ),
-                                                                                                ),
-                                                                                                SizedBox(
-                                                                                                  height: 5,
                                                                                                 ),
                                                                                                 Align(
-                                                                                                  child: Text(
-                                                                                                    '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
-                                                                                                    style: TextStyle(
-                                                                                                      color: Colors.black26,
-                                                                                                      fontSize: 9.0,
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                  alignment: Alignment.centerRight,
-                                                                                                ),
-                                                                                              ],
-                                                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                                                                            ),
-                                                                                            decoration: BoxDecoration(
-                                                                                                border: Border.all(
-                                                                                                  width: 1,
-                                                                                                  color: Colors.black12,
-                                                                                                ),
-                                                                                                borderRadius: BorderRadius.circular(10)),
-                                                                                          ),
-                                                                                          onTap: () async {
-                                                                                            String filePath = await saveAudioFile(url: '${getcontroller!.oneToOneChat[i].message!.message}', extension: extension, fileNName: p.basename('${getcontroller!.oneToOneChat[i].message!.message}'));
-                                                                                            await OpenFile.open(filePath);
-                                                                                          },
-                                                                                        )
-                                                                                      : Container(
-                                                                                          padding: EdgeInsets.symmetric(vertical: height * 0.010, horizontal: width * 0.030),
-                                                                                          decoration: BoxDecoration(color: primaryColor, borderRadius: BorderRadius.circular(8)),
-                                                                                          child: Column(
-                                                                                            children: [
-                                                                                              Text(
-                                                                                                '${getcontroller!.oneToOneChat[i].message!.message}',
-                                                                                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300, fontSize: 14),
-                                                                                              ),
-                                                                                              SizedBox(
-                                                                                                height: height / 100,
-                                                                                              ),
-                                                                                              Row(
-                                                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                                                children: <Widget>[
-                                                                                                  Padding(
-                                                                                                    padding: EdgeInsets.only(left: width / 50),
+                                                                                                  child: Padding(
+                                                                                                    padding: const EdgeInsets.all(8.0),
                                                                                                     child: Text(
-                                                                                                      //  '${timeago.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}"), locale: 'en_short')} ago',
-                                                                                                      //${DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").day} ${DateFormat.yMMM().format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}")).toString().split(' ')[0]} ,
                                                                                                       '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
                                                                                                       style: TextStyle(
-                                                                                                        color: Colors.black38,
+                                                                                                        color: Colors.white60,
                                                                                                         fontSize: 9.0,
                                                                                                       ),
                                                                                                     ),
                                                                                                   ),
-                                                                                                ],
-                                                                                              )
-                                                                                            ],
-                                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                  alignment: Alignment.bottomRight,
+                                                                                                ),
+                                                                                              ],
+                                                                                            ),
                                                                                           ),
-                                                                                        ),
+                                                                                          onTap: () {
+                                                                                            Get.to(CustomVideoPlayer(
+                                                                                              url: getcontroller!.oneToOneChat[i].message!.message,
+                                                                                            ));
+                                                                                            // Get.to(
+                                                                                            //     VideoApp(
+                                                                                            //   assetsPath:
+                                                                                            //       '${getcontroller!.oneToOneChat[i].message!.message}',
+                                                                                            // ));
+                                                                                          },
+                                                                                        )
+                                                                                      : extension.contains('.mp3') || extension.contains('.aac') || extension.contains('.ac3') || extension.contains('.h264') || extension.contains('.wav') || extension.contains('.csv') || extension.contains('.wma') || extension.contains('.wmv')
+                                                                                          ? Container(
+                                                                                              height: height * 0.1,
+                                                                                              width: width / 1.7,
+                                                                                              child: Stack(
+                                                                                                children: [
+                                                                                                  Container(
+                                                                                                    height: height * 0.080,
+                                                                                                    width: width / 1.7,
+                                                                                                    child: CustomAudioPlayer(
+                                                                                                      url: getcontroller!.oneToOneChat[i].message!.message,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                  Align(
+                                                                                                    child: Padding(
+                                                                                                      padding: const EdgeInsets.all(8.0),
+                                                                                                      child: Text(
+                                                                                                        '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
+                                                                                                        style: TextStyle(
+                                                                                                          color: Colors.black26,
+                                                                                                          fontSize: 9.0,
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                    alignment: Alignment.bottomRight,
+                                                                                                  ),
+                                                                                                ],
+                                                                                              ),
+                                                                                            )
+                                                                                          : extension.contains('.pdf')
+                                                                                              ? InkWell(
+                                                                                                  child: Container(
+                                                                                                    padding: EdgeInsets.all(5),
+                                                                                                    width: width / 3,
+                                                                                                    child: Column(
+                                                                                                      children: [
+                                                                                                        Icon(
+                                                                                                          Icons.file_copy_outlined,
+                                                                                                          size: 40,
+                                                                                                          color: primaryColor,
+                                                                                                        ),
+                                                                                                        SizedBox(
+                                                                                                          height: 5,
+                                                                                                        ),
+                                                                                                        Padding(
+                                                                                                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                                                                                          child: Text(
+                                                                                                            p
+                                                                                                                .basename(
+                                                                                                                  '${getcontroller!.oneToOneChat[i].message!.message}',
+                                                                                                                )
+                                                                                                                .split('=')[2]
+                                                                                                                .toString(),
+                                                                                                            style: TextStyle(fontSize: 10),
+                                                                                                            maxLines: 10,
+                                                                                                            overflow: TextOverflow.ellipsis,
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                        SizedBox(
+                                                                                                          height: 5,
+                                                                                                        ),
+                                                                                                        Align(
+                                                                                                          child: Text(
+                                                                                                            '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
+                                                                                                            style: TextStyle(
+                                                                                                              color: Colors.black26,
+                                                                                                              fontSize: 9.0,
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                          alignment: Alignment.centerRight,
+                                                                                                        ),
+                                                                                                      ],
+                                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                                                                    ),
+                                                                                                    decoration: BoxDecoration(
+                                                                                                        border: Border.all(
+                                                                                                          width: 1,
+                                                                                                          color: Colors.black12,
+                                                                                                        ),
+                                                                                                        borderRadius: BorderRadius.circular(10)),
+                                                                                                  ),
+                                                                                                  onTap: () async {
+                                                                                                    String filePath = await saveAudioFile(url: '${getcontroller!.oneToOneChat[i].message!.message}', extension: extension, fileNName: p.basename('${getcontroller!.oneToOneChat[i].message!.message}'));
+                                                                                                    await OpenFile.open(filePath);
+                                                                                                  },
+                                                                                                )
+                                                                                              : Container(
+                                                                                                  padding: EdgeInsets.symmetric(vertical: height * 0.010, horizontal: width * 0.030),
+                                                                                                  decoration: BoxDecoration(color: primaryColor, borderRadius: BorderRadius.circular(8)),
+                                                                                                  child: Column(
+                                                                                                    children: [
+                                                                                                      Text(
+                                                                                                        '${getcontroller!.oneToOneChat[i].message!.message}',
+                                                                                                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300, fontSize: 14),
+                                                                                                      ),
+                                                                                                      SizedBox(
+                                                                                                        height: height / 100,
+                                                                                                      ),
+                                                                                                      Row(
+                                                                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                                                                        children: <Widget>[
+                                                                                                          Padding(
+                                                                                                            padding: EdgeInsets.only(left: width / 50),
+                                                                                                            child: Text(
+                                                                                                              //  '${timeago.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}"), locale: 'en_short')} ago',
+                                                                                                              //${DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").day} ${DateFormat.yMMM().format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}")).toString().split(' ')[0]} ,
+                                                                                                              '${sdf2.format(DateTime.parse("${getcontroller!.oneToOneChat[i].message!.iosDateTime}").toUtc().toLocal())}',
+                                                                                                              style: TextStyle(
+                                                                                                                color: Colors.black38,
+                                                                                                                fontSize: 9.0,
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ],
+                                                                                                      )
+                                                                                                    ],
+                                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                  ),
+                                                                                                ),
                                                                       SizedBox(
                                                                         height: height /
                                                                             200,
@@ -1317,6 +1465,21 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                                     fontSize: 16,
                                                     letterSpacing: 0.5),
                                               ),
+                                              onTap: () {
+                                                Get.to(MapClass())!
+                                                    .then((value) {
+                                                  if (value is String) {
+                                                    print(
+                                                        'locatoin ia = $value');
+                                                    getcontroller!
+                                                        .onSentMessage(
+                                                            message: value,
+                                                            groupId:
+                                                                widget.groupID);
+                                                  }
+                                                  Navigator.of(context).pop();
+                                                });
+                                              },
                                             ),
                                             ListTile(
                                               leading: Icon(
@@ -1329,6 +1492,21 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                                     fontSize: 16,
                                                     letterSpacing: 0.5),
                                               ),
+                                              onTap: () {
+                                                Get.to(GetAllContactsPage())!
+                                                    .then((value) {
+                                                  if (value is String) {
+                                                    print(
+                                                        'Contacts ia = $value');
+                                                    getcontroller!
+                                                        .onSentMessage(
+                                                            message: value,
+                                                            groupId:
+                                                                widget.groupID);
+                                                  }
+                                                  Navigator.of(context).pop();
+                                                });
+                                              },
                                             ),
                                           ],
                                         );
@@ -1577,7 +1755,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
     if (!d.existsSync()) {
       d.createSync(recursive: true);
     }
-    return sdPath + "/test_${i++}.mp3";
+    return sdPath + "/test_${i++}.png";
   }
 }
 

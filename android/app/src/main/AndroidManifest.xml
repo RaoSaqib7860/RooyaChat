@@ -12,23 +12,17 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- Optional, you'll have to check this permission by yourself. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
-   <application
-        android:label="Rooya Chat"
+    <application
+        android:label="Mersaal"
         android:usesCleartextTraffic="true"
-       android:requestLegacyExternalStorage="true"
+        android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher">
-<!--       <provider-->
-<!--           android:name="androidx.core.content.FileProvider"-->
-<!--           android:authorities="${applicationId}.fileProvider"-->
-<!--           android:exported="false"-->
-<!--           android:grantUriPermissions="true"-->
-<!--           tools:replace="android:authorities">-->
-<!--           <meta-data-->
-<!--               android:name="android.support.FILE_PROVIDER_PATHS"-->
-<!--               android:resource="@xml/filepaths"-->
-<!--               tools:replace="android:resource" />-->
-<!--       </provider>-->
+       <meta-data android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyBKWeZRXoG7tZskLBKYTbjWh0xac0mZZAk"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -64,4 +58,21 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <queries>
+        <!-- If your app opens https URLs -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <!-- If your app makes calls -->
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
+        <!-- If your app emails -->
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="*/*" />
+        </intent>
+    </queries>
 </manifest>

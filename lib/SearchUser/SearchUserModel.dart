@@ -29,10 +29,10 @@ class Friends {
   String? firstName;
   String? lastName;
   String? userEmail;
-  Null? userAddress;
-  Null? userMobile;
+  String? userAddress;
+  String? userMobile;
   int? userStatus;
-  Null? userGender;
+  String? userGender;
   String? profilePictureUrl;
 
   Friends(

@@ -32,9 +32,9 @@ class OneToOneChatProvider extends GetxController {
   Future getAllMessage({String? groupId}) async {
     oneToOneChat.value =
         await ApiUtils.getMessage_list(groupID: groupId, start: 0, limit: 100);
-    if(oneToOneChat.isNotEmpty){
-      socket!.emit('announceSeen', oneToOneChat[0].message!.mId);
-    }
+    // if(oneToOneChat.isNotEmpty){
+    //   socket!.emit('announceSeen', oneToOneChat[0].message!.mId);
+    // }
   }
 
   sentMessageViaFile({String? filePath, String? groupId}) async {
@@ -53,18 +53,19 @@ class OneToOneChatProvider extends GetxController {
 
   Socket? socket;
 
-// 'http://chat.rooyatech.com:0/socket.io/?EIO=3&transport=websocket#'
+// 'http://cc.rooyatech.com:0/socket.io/?EIO=3&transport=websocket#'
   onConnectScocket({String? groupID}) {
     //
     try {
-      print('Connection start to socket group = $groupID');
+      print('token is = ${storage.read('token')}');
       print('${storage.read('token')}');
       socket = io(
-          'http://chat.rooyatech.com:3003',
+          'http://cc.rooyatech.com:4499',
           OptionBuilder()
               .setTransports(['websocket'])
               .disableAutoConnect()
               .build());
+      socket!.close();
       socket!.connect();
       socket!.emit('joinRoom', int.parse(groupID!));
       socket!.on('connect', (value) {
@@ -72,7 +73,7 @@ class OneToOneChatProvider extends GetxController {
             'register',
             jsonEncode({
               '_r': '${storage.read('token')}',
-              'url': "https://chat.rooyatech.com/",
+              'url': "https://cc.rooyatech.com/",
               'registrarType': "client",
             }));
         // socket!.emit('fetchOnReconnect', {

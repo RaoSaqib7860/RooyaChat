@@ -367,7 +367,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
 
   createAlertDialoge(BuildContext context) {
     TextEditingController customController = TextEditingController();
-
     return showDialog(
         context: context,
         builder: (context) {

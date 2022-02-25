@@ -1,69 +1,45 @@
-class UpcomingMessageModel {
-  GroupData? groupData;
-  int? senderId;
-
-  UpcomingMessageModel({this.groupData, this.senderId});
-
-  UpcomingMessageModel.fromJson(Map<String, dynamic> json) {
-    groupData = json['groupData'] != null
-        ? new GroupData.fromJson(json['groupData'])
-        : null;
-    senderId = json['senderId'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.groupData != null) {
-      data['groupData'] = this.groupData!.toJson();
-    }
-    data['senderId'] = this.senderId;
-    return data;
-  }
-}
-
-class GroupData {
+class MainGroupModel {
   int? groupId;
   List<String>? groupImage;
   String? groupName;
-  String? lastActive;
   int? groupType;
+  String? lastActive;
   int? block;
   int? meBlocker;
-  bool? meCreator;
   int? mute;
   List<Members>? members;
+  bool? meCreator;
   String? recentMessage;
   String? mainRecentMessage;
   int? senderId;
   String? messageType;
   int? pendingMessage;
 
-  GroupData(
+  MainGroupModel(
       {this.groupId,
         this.groupImage,
         this.groupName,
-        this.lastActive,
         this.groupType,
+        this.lastActive,
         this.block,
         this.meBlocker,
-        this.meCreator,
         this.mute,
         this.members,
+        this.meCreator,
         this.recentMessage,
         this.mainRecentMessage,
         this.senderId,
         this.messageType,
         this.pendingMessage});
 
-  GroupData.fromJson(Map<String, dynamic> json) {
+  MainGroupModel.fromJson(Map<String, dynamic> json) {
     groupId = json['groupId'];
     groupImage = json['groupImage'].cast<String>();
     groupName = json['groupName'];
-    lastActive = json['lastActive'];
     groupType = json['groupType'];
+    lastActive = json['lastActive'];
     block = json['block'];
     meBlocker = json['meBlocker'];
-    meCreator = json['meCreator'];
     mute = json['mute'];
     if (json['members'] != null) {
       members = <Members>[];
@@ -71,6 +47,7 @@ class GroupData {
         members!.add(new Members.fromJson(v));
       });
     }
+    meCreator = json['meCreator'];
     recentMessage = json['recentMessage'];
     mainRecentMessage = json['mainRecentMessage'];
     senderId = json['senderId'];
@@ -83,15 +60,15 @@ class GroupData {
     data['groupId'] = this.groupId;
     data['groupImage'] = this.groupImage;
     data['groupName'] = this.groupName;
-    data['lastActive'] = this.lastActive;
     data['groupType'] = this.groupType;
+    data['lastActive'] = this.lastActive;
     data['block'] = this.block;
     data['meBlocker'] = this.meBlocker;
-    data['meCreator'] = this.meCreator;
     data['mute'] = this.mute;
     if (this.members != null) {
       data['members'] = this.members!.map((v) => v.toJson()).toList();
     }
+    data['meCreator'] = this.meCreator;
     data['recentMessage'] = this.recentMessage;
     data['mainRecentMessage'] = this.mainRecentMessage;
     data['senderId'] = this.senderId;
@@ -106,10 +83,10 @@ class Members {
   String? firstName;
   String? lastName;
   String? userEmail;
-  Null? userAddress;
-  Null? userMobile;
+  String? userAddress;
+  String? userMobile;
   int? userStatus;
-  Null? userGender;
+  String? userGender;
   String? profilePictureUrl;
   int? active;
 
@@ -130,10 +107,10 @@ class Members {
     firstName = json['firstName'];
     lastName = json['lastName'];
     userEmail = json['userEmail'];
-    //userAddress = json['userAddress'];
-    //userMobile = json['userMobile'];
+    userAddress = json['userAddress'];
+    userMobile = json['userMobile'];
     userStatus = json['userStatus'];
-    //userGender = json['userGender'];
+    userGender = json['userGender'];
     profilePictureUrl = json['profilePictureUrl'];
     active = json['active'];
   }

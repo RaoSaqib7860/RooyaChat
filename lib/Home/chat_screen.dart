@@ -39,6 +39,10 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     controller.getGroupList();
     controller.connectToSocket();
+    controller.leaveGroup();
+    Future.delayed(Duration(seconds: 2), () {
+      controller.connectToSocket();
+    });
     if (!streamController.hasListener) {
       streamController.stream.listen((event) {
         setState(() {});
@@ -50,6 +54,12 @@ class _ChatScreenState extends State<ChatScreen> {
   DateFormat sdf2 = DateFormat("hh.mm aa");
 
   var listOfSelectedMember = <GroupModel>[].obs;
+
+  @override
+  void dispose() {
+    controller.leaveGroup();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +185,282 @@ class _ChatScreenState extends State<ChatScreen> {
               if (selectedIndexController.searchValue.value.isEmpty) {
                 return "${controller.listofMember[index].recentMessage}" ==
                         'You: '
-                    ? SizedBox()
+                    ? Column(
+                        children: [
+                          Slidable(
+                            endActionPane: ActionPane(
+                              motion: ScrollMotion(),
+                              children: [
+                                ClipOval(
+                                  child: Container(
+                                    height: 50,
+                                    width: 50,
+                                    child: Center(
+                                      child: SlidableAction(
+                                        // An action can be bigger than the others.
+                                        backgroundColor: Color(0xFF7BC043),
+                                        foregroundColor: Colors.white,
+                                        icon: CupertinoIcons.speaker_2_fill,
+                                        onPressed: (index) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(snackBar);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 5),
+                                  child: ClipOval(
+                                    child: Container(
+                                      height: 50,
+                                      width: 50,
+                                      child: Center(
+                                        child: SlidableAction(
+                                          onPressed: (index) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                          },
+                                          backgroundColor:
+                                              CupertinoColors.destructiveRed,
+                                          foregroundColor: Colors.white,
+                                          icon: CupertinoIcons.delete,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            startActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              dismissible: DismissiblePane(
+                                key: GlobalKey(),
+                                onDismissed: () {
+                                  // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                },
+                              ),
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 8),
+                                  child: ClipOval(
+                                    child: Container(
+                                      height: 50,
+                                      width: 50,
+                                      child: Center(
+                                        child: SlidableAction(
+                                          onPressed: (index) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                          },
+                                          backgroundColor: CupertinoColors.link,
+                                          foregroundColor: Colors.white,
+                                          icon: CupertinoIcons.italic,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 8),
+                                  child: ClipOval(
+                                    child: Container(
+                                      height: 50,
+                                      width: 50,
+                                      child: Center(
+                                        child: SlidableAction(
+                                          onPressed: (index) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                          },
+                                          backgroundColor: Color(0xFF21B7CA),
+                                          foregroundColor: Colors.white,
+                                          icon: CupertinoIcons.pin_fill,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    if (listOfSelectedMember.isEmpty) {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (c) => OneToOneChat(
+                                                    groupID: controller
+                                                        .listofMember[index]
+                                                        .groupId
+                                                        .toString(),
+                                                    name: "${controller.listofMember[index].members![0].firstName} " +
+                                                        "${controller.listofMember[index].members![0].lastName}",
+                                                    profilePic:
+                                                        "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                  ))).then((value) async {
+                                        controller.leaveGroup();
+                                        await controller.getGroupList();
+                                        Future.delayed(
+                                            Duration(
+                                                seconds: 1,
+                                                milliseconds: 500), () {
+                                          controller.connectToSocket();
+                                        });
+                                        setState(() {});
+                                      });
+                                    } else {
+                                      if (!listOfSelectedMember.contains(
+                                          controller.listofMember[index])) {
+                                        listOfSelectedMember.add(
+                                            controller.listofMember[index]);
+                                      } else {
+                                        listOfSelectedMember.remove(
+                                            controller.listofMember[index]);
+                                      }
+                                      setState(() {});
+                                    }
+                                  },
+                                  onLongPress: () {
+                                    if (!listOfSelectedMember.contains(
+                                        controller.listofMember[index])) {
+                                      listOfSelectedMember
+                                          .add(controller.listofMember[index]);
+                                    } else {
+                                      listOfSelectedMember.remove(
+                                          controller.listofMember[index]);
+                                    }
+                                    setState(() {});
+                                  },
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      listOfSelectedMember.isNotEmpty
+                                          ? !listOfSelectedMember.contains(
+                                                  controller
+                                                      .listofMember[index])
+                                              ? Container(
+                                                  height: 20,
+                                                  width: 20,
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                          width: 1,
+                                                          color: buttonColor)),
+                                                )
+                                              : Container(
+                                                  height: 20,
+                                                  width: 20,
+                                                  child: Icon(
+                                                    Icons.check_circle,
+                                                    color: buttonColor,
+                                                  ),
+                                                )
+                                          : SizedBox(),
+                                      Expanded(
+                                        child: ListTile(
+                                          leading: CircularProfileAvatar(
+                                            '',
+                                            radius: 28,
+                                            child: CachedNetworkImage(
+                                              imageUrl:
+                                                  "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                              placeholder: (context, url) =>
+                                                  CircularProgressIndicator(),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Icon(Icons.error),
+                                              fit: BoxFit.cover,
+                                            ),
+                                            onTap: listOfSelectedMember
+                                                    .isNotEmpty
+                                                ? null
+                                                : () {
+                                                    if (listOfSelectedMember
+                                                        .isEmpty) {
+                                                      Get.to(Photo_View_Class(
+                                                        url:
+                                                            "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                      ));
+                                                    }
+                                                  },
+                                            imageFit: BoxFit.cover,
+                                          ),
+                                          title: Text(
+                                            "${controller.listofMember[index].members![0].firstName}" +
+                                                " ${controller.listofMember[index].members![0].lastName}",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontFamily: AppFonts.segoeui,
+                                                fontSize: 16),
+                                          ),
+                                          subtitle: Text(
+                                            'Tap to chat',
+                                            style: TextStyle(
+                                                color: Color(0XFF373737),
+                                                fontFamily: AppFonts.segoeui,
+                                                fontSize: 12),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          trailing: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              "${controller.listofMember[index].pendingMessage}" ==
+                                                      '0'
+                                                  ? SizedBox()
+                                                  : Container(
+                                                      decoration: BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: Colors.green),
+                                                      child: Text(
+                                                        "${controller.listofMember[index].pendingMessage}",
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 10,
+                                                            fontFamily: AppFonts
+                                                                .segoeui),
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.all(5),
+                                                    ),
+                                              SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                //'${timeago.format(DateTime.parse("${controller.listofMember[index].lastActive}"), locale: 'en_short')} ago',
+                                                '${sdf2.format(DateTime.parse("${controller.listofMember[index].lastActive}").toUtc().toLocal())}',
+                                                style: TextStyle(
+                                                    color: Color(0XFF373737),
+                                                    fontSize: 10,
+                                                    fontFamily:
+                                                        AppFonts.segoeui),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  height: 1,
+                                  color: Colors.black12,
+                                  margin: EdgeInsets.only(
+                                      left: width * 0.23,
+                                      right: width * 0.040,
+                                      bottom: height * 0.018),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
                     : Column(
                         children: [
                           Slidable(
@@ -292,7 +577,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                                     profilePic:
                                                         "${controller.listofMember[index].members![0].profilePictureUrl}",
                                                   ))).then((value) async {
+                                        controller.leaveGroup();
                                         await controller.getGroupList();
+                                        Future.delayed(
+                                            Duration(
+                                                seconds: 1,
+                                                milliseconds: 500), () {
+                                          controller.connectToSocket();
+                                        });
                                         setState(() {});
                                       });
                                     } else {
@@ -382,22 +674,69 @@ class _ChatScreenState extends State<ChatScreen> {
                                                 fontFamily: AppFonts.segoeui,
                                                 fontSize: 16),
                                           ),
-                                          subtitle: Text(
-                                            controller.listofMember[index]
-                                                        .messageType ==
-                                                    'text'
-                                                ? "${controller.listofMember[index].recentMessage}"
-                                                : "${controller.listofMember[index].recentMessage}"
-                                                        .split(':')[0] +
-                                                    ' : ' +
-                                                    '${controller.listofMember[index].messageType}',
-                                            style: TextStyle(
-                                                color: Color(0XFF373737),
-                                                fontFamily: AppFonts.segoeui,
-                                                fontSize: 12),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
+                                          subtitle:
+                                              "${controller.listofMember[index].recentMessage}"
+                                                          .contains(
+                                                              'latitude') &&
+                                                      "${controller.listofMember[index].recentMessage}"
+                                                          .contains('longitude')
+                                                  ? Row(
+                                                      children: [
+                                                        Text(
+                                                          "${controller.listofMember[index].recentMessage}"
+                                                                  .split(
+                                                                      ':')[0] +
+                                                              ' : ',
+                                                          style: TextStyle(
+                                                              color: Color(
+                                                                  0XFF373737),
+                                                              fontFamily:
+                                                                  AppFonts
+                                                                      .segoeui,
+                                                              fontSize: 12),
+                                                        ),
+                                                        Icon(
+                                                          Icons
+                                                              .location_on_outlined,
+                                                          size: 16,
+                                                        ),
+                                                        SizedBox(
+                                                          width: 3,
+                                                        ),
+                                                        Text(
+                                                          'Location',
+                                                          style: TextStyle(
+                                                              color: Color(
+                                                                  0XFF373737),
+                                                              fontFamily:
+                                                                  AppFonts
+                                                                      .segoeui,
+                                                              fontSize: 12),
+                                                        )
+                                                      ],
+                                                    )
+                                                  : Text(
+                                                      controller
+                                                                  .listofMember[
+                                                                      index]
+                                                                  .messageType ==
+                                                              'text'
+                                                          ? "${controller.listofMember[index].recentMessage}"
+                                                          : "${controller.listofMember[index].recentMessage}"
+                                                                  .split(
+                                                                      ':')[0] +
+                                                              ' : ' +
+                                                              '${controller.listofMember[index].messageType}',
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0XFF373737),
+                                                          fontFamily:
+                                                              AppFonts.segoeui,
+                                                          fontSize: 12),
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
                                           trailing: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
@@ -636,7 +975,13 @@ class _ChatScreenState extends State<ChatScreen> {
                                             profilePic:
                                                 "${controller.listofMember[index].members![0].profilePictureUrl}",
                                           ))).then((value) async {
+                                controller.leaveGroup();
                                 await controller.getGroupList();
+                                Future.delayed(
+                                    Duration(seconds: 1, milliseconds: 500),
+                                    () {
+                                  controller.connectToSocket();
+                                });
                                 setState(() {});
                               });
                             },
