@@ -268,6 +268,10 @@ class ApiUtils {
         storage.write('profile', '${data['profilePic']}');
         storage.write('name', '${data['fullName']}');
         storage.write('token', model.response);
+        header = {
+          'Authorization': 'Basic YWRtaW46MTIzNA==',
+          'x-auth-token': '${storage.read('token')}',
+        };
         return true;
       } else {
         snackBarFailer('${data['status']['message']}');

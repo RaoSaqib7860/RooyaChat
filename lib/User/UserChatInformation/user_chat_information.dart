@@ -43,7 +43,6 @@ class _UserChatInformationState extends State<UserChatInformation> {
 
   bool isloading = false;
 
-
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -76,45 +75,57 @@ class _UserChatInformationState extends State<UserChatInformation> {
                                 },
                               ),
                               actions: [
-                                Container(
-                                  child: IconButton(
-                                      onPressed: () async{
-                                        FilePickerResult? result =
-                                            await FilePicker.platform
-                                            .pickFiles(
-                                          type: FileType.custom,
-                                          allowedExtensions: [
-                                            'jpg',
-                                            'jpeg',
-                                            'mp4',
-                                            'png',
-                                          ],
-                                        );
-                                        if (result!.files.isNotEmpty) {
-                                          print(
-                                              'file path is = ${result.files[0].path}');
-                                          setState(() {
-                                            isloading = true;
-                                          });
-                                          String path = await uploadFile('${result.files[0].path}');
-                                          print('upload path is =$path');
-                                          Map mapdata={'groupId':'${widget.groupID}','groupImage':'$path'};
-                                          await ApiUtils.changeGroupImagePost(map: mapdata);
-                                          await infoController
-                                              .getGroupInfo(groupID: widget.groupID);
-                                          setState(() {
-                                            isloading = false;
-                                          });
-                                        }
-                                      },
-                                      icon: Icon(
-                                        Icons.camera_alt_outlined,
-                                        color: Colors.white,
-                                      )),
-                                  margin: EdgeInsets.only(right: 10),
-                                  decoration: BoxDecoration(
-                                      color: buttonColor,
-                                      shape: BoxShape.circle),
+                                Visibility(
+                                  visible: infoController.listofFriends
+                                          .contains(
+                                              int.parse(storage.read('userID')))
+                                      ? true
+                                      : false,
+                                  child: Container(
+                                    child: IconButton(
+                                        onPressed: () async {
+                                          FilePickerResult? result =
+                                              await FilePicker.platform
+                                                  .pickFiles(
+                                            type: FileType.custom,
+                                            allowedExtensions: [
+                                              'jpg',
+                                              'jpeg',
+                                              'mp4',
+                                              'png',
+                                            ],
+                                          );
+                                          if (result!.files.isNotEmpty) {
+                                            print(
+                                                'file path is = ${result.files[0].path}');
+                                            setState(() {
+                                              isloading = true;
+                                            });
+                                            String path = await uploadFile(
+                                                '${result.files[0].path}');
+                                            print('upload path is =$path');
+                                            Map mapdata = {
+                                              'groupId': '${widget.groupID}',
+                                              'groupImage': '$path'
+                                            };
+                                            await ApiUtils.changeGroupImagePost(
+                                                map: mapdata);
+                                            await infoController.getGroupInfo(
+                                                groupID: widget.groupID);
+                                            setState(() {
+                                              isloading = false;
+                                            });
+                                          }
+                                        },
+                                        icon: Icon(
+                                          Icons.camera_alt_outlined,
+                                          color: Colors.white,
+                                        )),
+                                    margin: EdgeInsets.only(right: 10),
+                                    decoration: BoxDecoration(
+                                        color: buttonColor,
+                                        shape: BoxShape.circle),
+                                  ),
                                 )
                               ],
                               flexibleSpace: FlexibleSpaceBar(
@@ -130,8 +141,8 @@ class _UserChatInformationState extends State<UserChatInformation> {
                                   imageUrl:
                                       "${infoController.infoModel.value.groupImage}",
                                   fit: BoxFit.cover,
-                                  placeholder: (context, url) =>
-                                      Center(child: CircularProgressIndicator()),
+                                  placeholder: (context, url) => Center(
+                                      child: CircularProgressIndicator()),
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
                                 ),
@@ -161,30 +172,39 @@ class _UserChatInformationState extends State<UserChatInformation> {
                                       SizedBox(
                                         width: 30,
                                       ),
-                                      InkWell(
-                                        onTap: () async {
-                                          UpdateInfo(context,
-                                              infoController.infoModel.value,
-                                              (Map data) async {
-                                            setState(() {
-                                              isloading = true;
+                                      Visibility(
+                                        visible: infoController.listofFriends
+                                                .contains(int.parse(
+                                                    storage.read('userID')))
+                                            ? true
+                                            : false,
+                                        child: InkWell(
+                                          onTap: () async {
+                                            UpdateInfo(context,
+                                                infoController.infoModel.value,
+                                                (Map data) async {
+                                              setState(() {
+                                                isloading = true;
+                                              });
+                                              await ApiUtils
+                                                  .changeGroupNamePost(
+                                                      map: data);
+                                              await infoController.getGroupInfo(
+                                                  groupID: widget.groupID);
+                                              isloading = false;
+                                              setState(() {});
                                             });
-                                            await ApiUtils.changeGroupNamePost(
-                                                map: data);
-                                            await infoController.getGroupInfo(groupID: widget.groupID);
-                                            isloading = false;
-                                            setState(() {});
-                                          });
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(3),
-                                          decoration: BoxDecoration(
-                                              color: buttonColor,
-                                              shape: BoxShape.circle),
-                                          child: Icon(
-                                            Icons.edit,
-                                            size: 20,
-                                            color: Colors.white,
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.all(3),
+                                            decoration: BoxDecoration(
+                                                color: buttonColor,
+                                                shape: BoxShape.circle),
+                                            child: Icon(
+                                              Icons.edit,
+                                              size: 20,
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
                                       )
@@ -516,40 +536,49 @@ class _UserChatInformationState extends State<UserChatInformation> {
                                             ),
                                           ],
                                         ),
-                                        InkWell(
-                                          onTap: () async {
-                                            setState(() {
-                                              isloading = true;
-                                            });
-                                            await infoController
-                                                .getFriendList();
-                                            setState(() {
-                                              isloading = false;
-                                            });
-                                            createGroup(
-                                                context,
-                                                infoController.searchUserModel
-                                                    .value, (Map smap) async {
-                                              setState(() {
-                                                isloading = true;
-                                              });
-                                              await ApiUtils.addGroupMemberPost(
-                                                  map: smap);
-                                              setState(() {
-                                                isloading = false;
-                                              });
-                                              await infoController
-                                                  .getGroupInfo(groupID: widget.groupID);
-                                              setState(() {});
-                                              print(
-                                                  'Over all object is = $smap');
-                                            });
-                                          },
-                                          child: Icon(
-                                            Icons.add_circle_rounded,
-                                            color: buttonColor,
-                                          ),
-                                        ),
+                                        infoController.listofFriends.contains(
+                                                int.parse(
+                                                    storage.read('userID')))
+                                            ? InkWell(
+                                                onTap: () async {
+                                                  setState(() {
+                                                    isloading = true;
+                                                  });
+                                                  await infoController
+                                                      .getFriendList();
+                                                  setState(() {
+                                                    isloading = false;
+                                                  });
+                                                  createGroup(
+                                                      context,
+                                                      infoController
+                                                          .searchUserModel
+                                                          .value,
+                                                      (Map smap) async {
+                                                    setState(() {
+                                                      isloading = true;
+                                                    });
+                                                    await ApiUtils
+                                                        .addGroupMemberPost(
+                                                            map: smap);
+                                                    setState(() {
+                                                      isloading = false;
+                                                    });
+                                                    await infoController
+                                                        .getGroupInfo(
+                                                            groupID:
+                                                                widget.groupID);
+                                                    setState(() {});
+                                                    print(
+                                                        'Over all object is = $smap');
+                                                  });
+                                                },
+                                                child: Icon(
+                                                  Icons.add_circle_rounded,
+                                                  color: buttonColor,
+                                                ),
+                                              )
+                                            : SizedBox(),
                                         Container(
                                           height: 40,
                                           width: 250,
@@ -701,7 +730,10 @@ class _UserChatInformationState extends State<UserChatInformation> {
                                                                   .RemoveAdminpost(
                                                                       map: map);
                                                               await infoController
-                                                                  .getGroupInfo(groupID: widget.groupID);
+                                                                  .getGroupInfo(
+                                                                      groupID:
+                                                                          widget
+                                                                              .groupID);
                                                               setState(() {
                                                                 isloading =
                                                                     false;
@@ -727,7 +759,10 @@ class _UserChatInformationState extends State<UserChatInformation> {
                                                                       map:
                                                                           data);
                                                               await infoController
-                                                                  .getGroupInfo(groupID: widget.groupID);
+                                                                  .getGroupInfo(
+                                                                      groupID:
+                                                                          widget
+                                                                              .groupID);
                                                               isloading = false;
                                                               setState(() {});
                                                             }),
@@ -757,7 +792,10 @@ class _UserChatInformationState extends State<UserChatInformation> {
                                                                   .addGroupAdminpost(
                                                                       map: map);
                                                               await infoController
-                                                                  .getGroupInfo(groupID: widget.groupID);
+                                                                  .getGroupInfo(
+                                                                      groupID:
+                                                                          widget
+                                                                              .groupID);
                                                               isloading = false;
                                                               setState(() {});
                                                             }),
@@ -781,7 +819,10 @@ class _UserChatInformationState extends State<UserChatInformation> {
                                                                       map:
                                                                           data);
                                                               await infoController
-                                                                  .getGroupInfo(groupID: widget.groupID);
+                                                                  .getGroupInfo(
+                                                                      groupID:
+                                                                          widget
+                                                                              .groupID);
                                                               isloading = false;
                                                               setState(() {});
                                                             }),

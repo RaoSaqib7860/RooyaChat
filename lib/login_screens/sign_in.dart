@@ -25,7 +25,7 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
   SignInController controller = Get.put(SignInController());
-
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -38,7 +38,7 @@ class _SignInState extends State<SignIn> {
               padding: EdgeInsets.symmetric(horizontal: 5.0.w),
               child: SingleChildScrollView(
                 child: Form(
-                  key: controller.formKey,
+                  key: formKey,
                   child: Column(
                     children: [
                       SizedBox(

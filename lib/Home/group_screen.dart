@@ -23,6 +23,8 @@ import 'package:rooya/text_filed/app_font.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../OneToOneChat.dart';
 
+bool startfirstTimeGroup = false;
+
 class GroupScreen extends StatefulWidget {
   const GroupScreen({Key? key}) : super(key: key);
 
@@ -106,30 +108,30 @@ class _GroupScreenState extends State<GroupScreen> {
                                     size: 20,
                                   ),
                                 ),
-                                IconButton(
-                                  onPressed: () async {
-                                    for (var i = 0;
-                                        i < listOfSelectedMember.length;
-                                        i++) {
-                                      Map payLoad = {
-                                        'g_id': listOfSelectedMember[i]
-                                            .groupId
-                                            .toString(),
-                                        'userId': listOfSelectedMember[i]
-                                            .senderId
-                                            .toString()
-                                      };
-                                      ApiUtils.removeGroupApi(map: payLoad);
-                                      controller.listofMember
-                                          .remove(listOfSelectedMember[i]);
-                                    }
-                                    listOfSelectedMember.clear();
-                                  },
-                                  icon: Icon(
-                                    CupertinoIcons.delete,
-                                    size: 20,
-                                  ),
-                                ),
+                                // IconButton(
+                                //   onPressed: () async {
+                                //     for (var i = 0;
+                                //         i < listOfSelectedMember.length;
+                                //         i++) {
+                                //       Map payLoad = {
+                                //         'g_id': listOfSelectedMember[i]
+                                //             .groupId
+                                //             .toString(),
+                                //         'userId': listOfSelectedMember[i]
+                                //             .senderId
+                                //             .toString()
+                                //       };
+                                //       ApiUtils.removeGroupApi(map: payLoad);
+                                //       controller.listofMember
+                                //           .remove(listOfSelectedMember[i]);
+                                //     }
+                                //     listOfSelectedMember.clear();
+                                //   },
+                                //   icon: Icon(
+                                //     CupertinoIcons.delete,
+                                //     size: 20,
+                                //   ),
+                                // ),
                                 IconButton(
                                   onPressed: () {},
                                   icon: Icon(
@@ -307,7 +309,7 @@ class _GroupScreenState extends State<GroupScreen> {
                                                         name:
                                                             "${controller.listofMember[index].groupName}",
                                                         profilePic:
-                                                            "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                            "${controller.listofMember[index].groupImage}",
                                                       ))).then((value) async {
                                             controller.leaveGroup();
                                             await controller.getGroupList();
@@ -378,7 +380,7 @@ class _GroupScreenState extends State<GroupScreen> {
                                                 radius: 28,
                                                 child: CachedNetworkImage(
                                                   imageUrl:
-                                                      "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                      "${controller.listofMember[index].groupImage}",
                                                   placeholder: (context, url) =>
                                                       CircularProgressIndicator(),
                                                   errorWidget:
@@ -395,7 +397,7 @@ class _GroupScreenState extends State<GroupScreen> {
                                                           Get.to(
                                                               Photo_View_Class(
                                                             url:
-                                                                "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                                "${controller.listofMember[index].groupImage}",
                                                           ));
                                                         }
                                                       },
@@ -595,7 +597,7 @@ class _GroupScreenState extends State<GroupScreen> {
                                                         name:
                                                             "${controller.listofMember[index].groupName}",
                                                         profilePic:
-                                                            "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                            "${controller.listofMember[index].groupImage}",
                                                       ))).then((value) async {
                                             controller.leaveGroup();
                                             await controller.getGroupList();
@@ -666,7 +668,7 @@ class _GroupScreenState extends State<GroupScreen> {
                                                 radius: 28,
                                                 child: CachedNetworkImage(
                                                   imageUrl:
-                                                      "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                      "${controller.listofMember[index].groupImage}",
                                                   placeholder: (context, url) =>
                                                       CircularProgressIndicator(),
                                                   errorWidget:
@@ -683,7 +685,7 @@ class _GroupScreenState extends State<GroupScreen> {
                                                           Get.to(
                                                               Photo_View_Class(
                                                             url:
-                                                                "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                                "${controller.listofMember[index].groupImage}",
                                                           ));
                                                         }
                                                       },
@@ -889,7 +891,7 @@ class _GroupScreenState extends State<GroupScreen> {
                                     radius: 28,
                                     child: CachedNetworkImage(
                                       imageUrl:
-                                          "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                          "${controller.listofMember[index].groupImage}",
                                       placeholder: (context, url) =>
                                           CircularProgressIndicator(),
                                       errorWidget: (context, url, error) =>
@@ -964,7 +966,7 @@ class _GroupScreenState extends State<GroupScreen> {
                                                 name:
                                                     "${controller.listofMember[index].groupName}",
                                                 profilePic:
-                                                    "${controller.listofMember[index].members![0].profilePictureUrl}",
+                                                    "${controller.listofMember[index].groupImage}",
                                               ))).then((value) async {
                                     controller.leaveGroup();
                                     await controller.getGroupList();

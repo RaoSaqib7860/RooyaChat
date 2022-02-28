@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:rooya/ApiConfig/ApiUtils.dart';
+import 'package:rooya/ClickController/SelectIndexController.dart';
+import 'package:rooya/GroupProviders/GroupProvider.dart';
 import 'package:rooya/login_screens/sign_in_tabs_handle.dart';
 import 'package:rooya/responsive/primary_color.dart';
 import 'package:rooya/text_filed/app_font.dart';
@@ -262,6 +264,10 @@ class _SettingsState extends State<Settings> {
                     textColor: Color(0xffEC2B17)),
                 InkWell(
                   onTap: () {
+                    var selectController = Get.find<SelectIndexController>();
+                    final controller = Get.find<GroupProvider>();
+                    selectController.updateColor(0);
+                    controller.listofMember.value=[];
                     storage.erase();
                     Get.offAll(SignInTabsHandle());
                   },

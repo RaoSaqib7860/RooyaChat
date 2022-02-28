@@ -1,13 +1,15 @@
 class GroupModel {
   int? groupId;
-  List<String>? groupImage;
+  String? groupImage;
   String? groupName;
+  String? groupDecs;
   int? groupType;
   String? lastActive;
   int? block;
+  String? groupAdmin;
   int? meBlocker;
   int? mute;
-  List<Members>? members;
+  List<Members>? members=[];
   bool? meCreator;
   String? recentMessage;
   String? mainRecentMessage;
@@ -17,28 +19,32 @@ class GroupModel {
 
   GroupModel(
       {this.groupId,
-      this.groupImage,
-      this.groupName,
-      this.groupType,
-      this.lastActive,
-      this.block,
-      this.meBlocker,
-      this.mute,
-      this.members,
-      this.meCreator,
-      this.recentMessage,
-      this.mainRecentMessage,
-      this.senderId,
-      this.messageType,
-      this.pendingMessage});
+        this.groupImage,
+        this.groupName,
+        this.groupDecs,
+        this.groupType,
+        this.lastActive,
+        this.block,
+        this.groupAdmin,
+        this.meBlocker,
+        this.mute,
+        this.members,
+        this.meCreator,
+        this.recentMessage,
+        this.mainRecentMessage,
+        this.senderId,
+        this.messageType,
+        this.pendingMessage});
 
   GroupModel.fromJson(Map<String, dynamic> json) {
     groupId = json['groupId'];
-    groupImage = json['groupImage'].cast<String>();
+    groupImage = json['groupImage'];
     groupName = json['groupName'];
+    groupDecs = json['groupDecs'];
     groupType = json['groupType'];
     lastActive = json['lastActive'];
     block = json['block'];
+    groupAdmin = json['groupAdmin'];
     meBlocker = json['meBlocker'];
     mute = json['mute'];
     if (json['members'] != null) {
@@ -49,20 +55,22 @@ class GroupModel {
     }
     meCreator = json['meCreator'];
     recentMessage = json['recentMessage'];
-    mainRecentMessage = json['mainRecentMessage'];
+    mainRecentMessage = json['mainRecentMessage']??"";
     senderId = json['senderId'];
-    messageType = json['messageType'];
+    messageType = json['messageType']??'';
     pendingMessage = json['pendingMessage'];
   }
 
-  Map<String, dynamic> makkanMalikAyaBhago() {
+  Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['groupId'] = this.groupId;
     data['groupImage'] = this.groupImage;
     data['groupName'] = this.groupName;
+    data['groupDecs'] = this.groupDecs;
     data['groupType'] = this.groupType;
     data['lastActive'] = this.lastActive;
     data['block'] = this.block;
+    data['groupAdmin'] = this.groupAdmin;
     data['meBlocker'] = this.meBlocker;
     data['mute'] = this.mute;
     if (this.members != null) {
@@ -80,6 +88,7 @@ class GroupModel {
 
 class Members {
   int? userId;
+  bool? isadmin;
   String? firstName;
   String? lastName;
   String? userEmail;
@@ -92,25 +101,27 @@ class Members {
 
   Members(
       {this.userId,
-      this.firstName,
-      this.lastName,
-      this.userEmail,
-      this.userAddress,
-      this.userMobile,
-      this.userStatus,
-      this.userGender,
-      this.profilePictureUrl,
-      this.active});
+        this.isadmin,
+        this.firstName,
+        this.lastName,
+        this.userEmail,
+        this.userAddress,
+        this.userMobile,
+        this.userStatus,
+        this.userGender,
+        this.profilePictureUrl,
+        this.active});
 
   Members.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
+    isadmin = json['isadmin'];
     firstName = json['firstName'];
     lastName = json['lastName'];
     userEmail = json['userEmail'];
-    userAddress = json['userAddress'].toString();
-    userMobile = json['userMobile'].toString();
+    userAddress = json['userAddress'];
+    userMobile = json['userMobile'];
     userStatus = json['userStatus'];
-    userGender = json['userGender'].toString();
+    userGender = json['userGender'];
     profilePictureUrl = json['profilePictureUrl'];
     active = json['active'];
   }
@@ -118,6 +129,7 @@ class Members {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['userId'] = this.userId;
+    data['isadmin'] = this.isadmin;
     data['firstName'] = this.firstName;
     data['lastName'] = this.lastName;
     data['userEmail'] = this.userEmail;

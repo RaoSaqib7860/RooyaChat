@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -138,6 +139,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
   }
 
   var selectedOneToOneChat = <OneToOneChatModel>[].obs;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +147,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
     var width = Get.width;
     return SafeArea(
       child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: Colors.white,
         body: Stack(
           children: [
@@ -184,7 +187,15 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                     ),
                                   ),
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Clipboard.setData(ClipboardData(
+                                          text:
+                                              "${getcontroller!.oneToOneChat[i].message!.message}"));
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              content: Text("Coped"),
+                                              duration: Duration(seconds: 1)));
+                                    },
                                     icon: Icon(
                                       Icons.copy,
                                       size: 20,
@@ -250,12 +261,14 @@ class _OneToOneChatState extends State<OneToOneChat> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    Get.to(UserChatInformation(
-                                      groupID: widget.groupID,
-                                    ))!
-                                        .then((value) {
-                                      Navigator.of(context).pop();
-                                    });
+                                    if (widget.fromGroup!) {
+                                      Get.to(UserChatInformation(
+                                        groupID: widget.groupID,
+                                      ))!
+                                          .then((value) {
+                                        Navigator.of(context).pop();
+                                      });
+                                    }
                                   },
                                   child: Text(
                                     '${widget.name}',
@@ -407,7 +420,13 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                                                         title: Text(
                                                                             "Copy"),
                                                                         onPressed:
-                                                                            () {},
+                                                                            () {
+                                                                          Clipboard.setData(
+                                                                              ClipboardData(text: "${getcontroller!.oneToOneChat[i].message!.message}"));
+                                                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                                              content: Text('Copyed'),
+                                                                              duration: Duration(seconds: 1)));
+                                                                        },
                                                                         trailingIcon: Icon(
                                                                             CupertinoIcons
                                                                                 .square_on_circle,
@@ -917,9 +936,19 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                                                                 20)),
                                                                     FocusedMenuItem(
                                                                         title: Text(
-                                                                            "Copy"),
+                                                                            'Copy'),
                                                                         onPressed:
-                                                                            () {},
+                                                                            () {
+                                                                          Clipboard.setData(
+                                                                              ClipboardData(text: "${getcontroller!.oneToOneChat[i].message!.message}"));
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(SnackBar(
+                                                                            content:
+                                                                                Text('Copyed'),
+                                                                            duration:
+                                                                                Duration(seconds: 1),
+                                                                          ));
+                                                                        },
                                                                         trailingIcon: Icon(
                                                                             CupertinoIcons
                                                                                 .square_on_circle,

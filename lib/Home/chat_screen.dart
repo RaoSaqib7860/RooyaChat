@@ -103,22 +103,51 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                             IconButton(
                               onPressed: () async {
-                                for (var i = 0;
-                                    i < listOfSelectedMember.length;
-                                    i++) {
-                                  Map payLoad = {
-                                    'g_id': listOfSelectedMember[i]
-                                        .groupId
-                                        .toString(),
-                                    'userId': listOfSelectedMember[i]
-                                        .senderId
-                                        .toString()
-                                  };
-                                  ApiUtils.removeGroupApi(map: payLoad);
-                                  controller.listofMember
-                                      .remove(listOfSelectedMember[i]);
-                                }
-                                listOfSelectedMember.clear();
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return CupertinoAlertDialog(
+                                        title: Text("Alert"),
+                                        actions: [
+                                          CupertinoDialogAction(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text("Cancel")),
+                                          CupertinoDialogAction(
+                                              onPressed: () {
+                                                for (var i = 0;
+                                                    i <
+                                                        listOfSelectedMember
+                                                            .length;
+                                                    i++) {
+                                                  Map payLoad = {
+                                                    'g_id':
+                                                        listOfSelectedMember[i]
+                                                            .groupId
+                                                            .toString(),
+                                                    'userId':
+                                                        listOfSelectedMember[i]
+                                                            .senderId
+                                                            .toString()
+                                                  };
+                                                  ApiUtils.removeGroupApi(
+                                                      map: payLoad);
+                                                  controller.listofMember
+                                                      .remove(
+                                                          listOfSelectedMember[
+                                                              i]);
+                                                }
+                                                // listOfSelectedMember.clear();
+                                                setState(() {});
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text("Ok")),
+                                        ],
+                                        content: Text(
+                                            "You want to delete the chat?"),
+                                      );
+                                    });
                               },
                               icon: Icon(
                                 CupertinoIcons.delete,

@@ -1,4 +1,4 @@
-package com.chat.rooya;
+package mersaal.rooya.com;
 
 import io.flutter.embedding.android.FlutterActivity;
 
