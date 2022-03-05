@@ -256,37 +256,39 @@ class _OneToOneChatState extends State<OneToOneChat> {
                             SizedBox(
                               width: 10,
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    if (widget.fromGroup!) {
-                                      Get.to(UserChatInformation(
-                                        groupID: widget.groupID,
-                                      ))!
-                                          .then((value) {
-                                        Navigator.of(context).pop();
-                                      });
-                                    }
-                                  },
-                                  child: Text(
-                                    '${widget.name}',
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  if (widget.fromGroup!) {
+                                    Get.to(UserChatInformation(
+                                      groupID: widget.groupID,
+                                    ))!
+                                        .then((value) {
+                                      Navigator.of(context).pop();
+                                    });
+                                  }
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${widget.name}',
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.black),
+                                    ),
+                                    Obx(
+                                      () => getcontroller!.isReciverTyping.value
+                                          ? Text(
+                                              'Typing ...',
+                                              style: TextStyle(
+                                                  fontSize: 9,
+                                                  color: Colors.black26),
+                                            )
+                                          : SizedBox(),
+                                    )
+                                  ],
                                 ),
-                                Obx(
-                                  () => getcontroller!.isReciverTyping.value
-                                      ? Text(
-                                          'Typing ...',
-                                          style: TextStyle(
-                                              fontSize: 9,
-                                              color: Colors.black26),
-                                        )
-                                      : SizedBox(),
-                                )
-                              ],
+                              ),
                             ),
                           ],
                         ),
@@ -723,7 +725,6 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                                                                                                 .basename(
                                                                                                                   '${getcontroller!.oneToOneChat[i].message!.message}',
                                                                                                                 )
-                                                                                                                .split('=')[2]
                                                                                                                 .toString(),
                                                                                                             style: TextStyle(fontSize: 10),
                                                                                                             maxLines: 10,
@@ -1165,12 +1166,7 @@ class _OneToOneChatState extends State<OneToOneChat> {
                                                                                                         Padding(
                                                                                                           padding: EdgeInsets.symmetric(horizontal: 10),
                                                                                                           child: Text(
-                                                                                                            p
-                                                                                                                .basename(
-                                                                                                                  '${getcontroller!.oneToOneChat[i].message!.message}',
-                                                                                                                )
-                                                                                                                .split('=')[2]
-                                                                                                                .toString(),
+                                                                                                            p.basename('${getcontroller!.oneToOneChat[i].message!.message}').toString(),
                                                                                                             style: TextStyle(fontSize: 10),
                                                                                                             maxLines: 10,
                                                                                                             overflow: TextOverflow.ellipsis,

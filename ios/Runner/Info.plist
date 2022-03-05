@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Mersaal</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -20,6 +22,57 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+    <key>FirebaseAppDelegateProxyEnabled</key>
+    <false/>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>youtube</string>
+        <string>whatsapp</string>
+        <string>instagram</string>
+        <string>fb</string>
+        <string>tel</string>
+        <string>mailto</string>
+    </array>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>Your Music Library is used to update Alerts.</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Your bluetooth is used for directions.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Your bluetooth is used for directions.</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Your calendar is used to give precise date for messages.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Your camera is used to update your profile picture and add product images.</string>
+    <key>NSContactsUsageDescription</key>
+    <string>Your contact list is used to connect</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Dialboxx uses your local network for Server communication.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Your location is used to provide directions to the destination.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Your location is used to show you businesses nearby.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Your location is used to provide directions to the destination.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Dialboxx needs to access your device microphone for audio.</string>
+    <key>NSMotionUsageDescription</key>
+    <string>Dialboxx would like to access your motion.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Your photo library is used to update profile picture and add product images.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>The app uses speech recognition for dictating messages.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>remote-notification</string>
+    </array>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+        <key>NSAllowsArbitraryLoadsForMedia</key>
+        <true/>
+    </dict>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -41,5 +94,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+    <key>io.flutter.embedded_views_preview</key>
+    <true/>
+    <key>com.apple.security.network.client</key>
+    <true/>
 </dict>
 </plist>

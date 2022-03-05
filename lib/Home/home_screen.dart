@@ -23,20 +23,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List iconList = [
     'assets/user/prs.svg',
-    'assets/user/single.svg',
+    //'assets/user/single.svg',
     'assets/user/persons.svg',
-    'assets/user/sw.svg',
-    'assets/user/fvrt.svg',
+   // 'assets/user/sw.svg',
+   // 'assets/user/fvrt.svg',
   ];
 
   int currentIndex = 0;
 
   List tabContent = [
     (ChatScreen()),
-    (FriendsScreen()),
+    //(FriendsScreen()),
     (GroupScreen()),
-    (RoomsScreen()),
-    (FriendsScreen()),
+   // (RoomsScreen()),
+   // (FriendsScreen()),
   ];
 
   @override
@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Scaffold(
             backgroundColor: Colors.white,
             body: DefaultTabController(
-                length: 5,
+                length: 2,
                 child: NestedScrollView(
                     physics: NeverScrollableScrollPhysics(),
                     headerSliverBuilder: (context, isScrool) {

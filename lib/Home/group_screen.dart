@@ -346,9 +346,6 @@ class _GroupScreenState extends State<GroupScreen> {
                                       },
                                       child: Row(
                                         children: [
-                                          SizedBox(
-                                            width: 10,
-                                          ),
                                           listOfSelectedMember.isNotEmpty
                                               ? !listOfSelectedMember.contains(
                                                       controller
@@ -634,9 +631,6 @@ class _GroupScreenState extends State<GroupScreen> {
                                       },
                                       child: Row(
                                         children: [
-                                          SizedBox(
-                                            width: 10,
-                                          ),
                                           listOfSelectedMember.isNotEmpty
                                               ? !listOfSelectedMember.contains(
                                                       controller

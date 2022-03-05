@@ -1,4 +1,4 @@
-package mersaal.rooya.com;
+package com.mersaal.app;
 
 import io.flutter.embedding.android.FlutterActivity;
 

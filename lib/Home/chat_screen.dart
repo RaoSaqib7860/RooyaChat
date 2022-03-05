@@ -111,6 +111,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                         actions: [
                                           CupertinoDialogAction(
                                               onPressed: () {
+                                                listOfSelectedMember.clear();
+                                                setState(() {});
                                                 Navigator.of(context).pop();
                                               },
                                               child: Text("Cancel")),
@@ -138,7 +140,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                                           listOfSelectedMember[
                                                               i]);
                                                 }
-                                                // listOfSelectedMember.clear();
+                                                listOfSelectedMember.clear();
                                                 setState(() {});
                                                 Navigator.of(context).pop();
                                               },
@@ -365,9 +367,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                   },
                                   child: Row(
                                     children: [
-                                      SizedBox(
-                                        width: 10,
-                                      ),
                                       listOfSelectedMember.isNotEmpty
                                           ? !listOfSelectedMember.contains(
                                                   controller
@@ -641,9 +640,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                   },
                                   child: Row(
                                     children: [
-                                      SizedBox(
-                                        width: 10,
-                                      ),
                                       listOfSelectedMember.isNotEmpty
                                           ? !listOfSelectedMember.contains(
                                                   controller
@@ -1038,7 +1034,17 @@ class _ChatScreenState extends State<ChatScreen> {
       // floatingActionButton: CustomButton(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.to(NewUserSearchpage());
+          Get.to(NewUserSearchpage())!.then((value) async{
+            controller.leaveGroup();
+            await controller.getGroupList();
+            Future.delayed(
+                Duration(
+                    seconds: 1,
+                    milliseconds: 500), () {
+              controller.connectToSocket();
+            });
+            setState(() {});
+          });
         },
         child: SvgPicture.asset(
           'assets/user/prs.svg',
