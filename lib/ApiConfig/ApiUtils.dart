@@ -4,33 +4,72 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:rooya/ApiConfig/BaseURL.dart';
 import 'package:rooya/GlobalWidget/SnackBarApp.dart';
-import 'package:rooya/Media/GroupInfoModel.dart';
-import 'package:rooya/ModelClasses/GroupModel.dart';
-import 'package:rooya/ModelClasses/LoginModel.dart';
-import 'package:rooya/Providers/OneToOneModel.dart';
-import 'package:rooya/SearchUser/SearchUserModel.dart';
+import 'package:rooya/Models/LoginModel.dart';
+import 'package:rooya/Models/FriendsListModel.dart';
+import 'package:rooya/Models/GroupChatModel.dart';
+import 'package:rooya/Models/GroupModel.dart';
+import 'package:rooya/Models/OneTwoOneOuterModel.dart';
+import 'package:rooya/Models/UserChatModel.dart';
+import 'package:rooya/Models/UserDataModel.dart';
+import 'package:rooya/Models/UserStoriesModel.dart';
+import 'package:rooya/Screens/SearchUser/SearchUserModel.dart';
+import 'package:rooya/Screens/UserChat/Media/GroupInfoModel.dart';
+import 'package:rooya/Utils/UserDataService.dart';
 
-final getGroups = 'getGroups';
-final login = 'login/';
-final sendMessage = 'sendMessage';
-final getMessage = 'getMessage';
-final friendList = 'friendList';
+final getChat = 'get_chats';
+final getroomListChat = 'group_chat';
+final allStories = 'get-user-stories';
+final getRoom = 'group_chat';
+final getGroupChat = 'group_chat';
+final login = 'auth';
+final userData = 'get-user-data';
+final sendMessage = 'send-message';
+final getMessage = 'get_user_messages';
+final friendList = 'get-friends';
+final create_group = 'group_chat';
+final addMemberToGroup = 'group_chat';
 final removeGroup = 'removeGroup';
 final removeMessage = 'removePost';
 final getGroupsById = 'getGroupsById';
-final addGroupAdmin = 'addGroupAdmin';
+final addGroupAdmin = 'group_chat';
 final RemoveAdmin = 'RemoveAdmin';
 final addGroupMember = 'addGroupMember';
 final deleteMember = 'deleteMember';
 final changeGroupName = 'changeGroupName';
-final changeGroupImage='changeGroupImage';
+final changeGroupImage = 'changeGroupImage';
+final blockGroup = 'blockGroup';
+final unblockGroup = 'unblockGroup';
+
 GetStorage storage = GetStorage();
 Map<String, String> header = {
   'Authorization': 'Basic YWRtaW46MTIzNA==',
   'x-auth-token': '${storage.read('token')}',
 };
+String token = '?access_token=${storage.read('token')}';
 
 class ApiUtils {
+  static Future blockUser({Map? map}) async {
+    var url = Uri.parse('$baseUrl$blockGroup');
+    try {
+      var responce = await http.post(url, headers: header, body: map);
+      var data = jsonDecode(responce.body);
+      print('blockGroup is = $data');
+    } catch (e) {
+      print('Exception is = $e');
+    }
+  }
+
+  static Future unblockUser({Map? map}) async {
+    var url = Uri.parse('$baseUrl$unblockGroup');
+    try {
+      var responce = await http.post(url, headers: header, body: map);
+      var data = jsonDecode(responce.body);
+      print('unblockGroup is = $data');
+    } catch (e) {
+      print('Exception is = $e');
+    }
+  }
+
   static Future changeGroupImagePost({Map? map}) async {
     var url = Uri.parse('$baseUrl$changeGroupImage');
     try {
@@ -87,9 +126,10 @@ class ApiUtils {
   }
 
   static Future RemoveAdminpost({Map? map}) async {
-    var url = Uri.parse('$baseUrl$RemoveAdmin');
+    print('RemoveAdminpost request = ${map}');
+    var url = Uri.parse('$baseUrl$addGroupAdmin$token');
     try {
-      var responce = await http.post(url, headers: header, body: map);
+      var responce = await http.post(url, body: map);
       var data = jsonDecode(responce.body);
       print('RemoveAdminpost is = $data');
     } catch (e) {
@@ -108,6 +148,24 @@ class ApiUtils {
     } catch (e) {
       print('Exception is = $e');
     }
+  }
+
+  static Future<String> newsendMessagepost({Map? map}) async {
+    String groupid = '';
+    var url = Uri.parse('$baseUrl$sendMessage');
+    try {
+      var responce = await http.post(url, headers: header, body: map);
+      var data = jsonDecode(responce.body);
+      print('send message data is = $data');
+      if (data['status']['code'] == 200) {
+        groupid = data['response']['groupId'].toString();
+        return groupid;
+      } else {}
+      return groupid;
+    } catch (e) {
+      print('Exception is = $e');
+    }
+    return groupid;
   }
 
   static Future removeMessageApi({Map? map}) async {
@@ -136,17 +194,39 @@ class ApiUtils {
     }
   }
 
-  static Future<List<GroupModel>> getGroup({int? limit, int? start}) async {
-    var url = Uri.parse('$baseUrl$getGroups?limit=$limit&start=$start');
+  static Future<OneToOneChatOuterModel> getGroup(
+      {int? limit, int? start, Map? mapData}) async {
+    var url = Uri.parse('$baseUrl$getChat$token');
     try {
-      var responce = await http.get(url, headers: header);
+      var responce = await http.post(url, body: mapData);
       var data = jsonDecode(responce.body);
-      log('group data is = $data');
-      if (data['status']['code'] == 200) {
-        List list = data['response'];
+      // print('Chat data is = $data');
+      print('Chat data is = ${data['api_status']}');
+      if (data['api_status'] == 200) {
+        print('in 200 now');
+        OneToOneChatOuterModel modellist =
+            OneToOneChatOuterModel.fromJson(data);
+        return modellist;
+      } else {
+        return OneToOneChatOuterModel(apiStatus: 400);
+      }
+    } catch (e) {
+      print('Exception is = $e');
+    }
+    return OneToOneChatOuterModel(apiStatus: 400);
+  }
+
+  static Future<List<GroupModel>> getMainGroup(
+      {int? limit, int? start, Map? mapData}) async {
+    var url = Uri.parse('$baseUrl$getChat$token');
+    try {
+      var responce = await await http.post(url, body: mapData);
+      var data = jsonDecode(responce.body);
+      // print('group data is = $data');
+      if (data['api_status'] == 200) {
+        List list = data['data'];
         List<GroupModel> modellist =
             list.map((e) => GroupModel.fromJson(e)).toList();
-        modellist.removeWhere((element) => element.groupType == 0);
         return modellist;
       } else {
         return [];
@@ -157,18 +237,16 @@ class ApiUtils {
     return [];
   }
 
-  static Future<List<GroupModel>> getMainGroup({int? limit, int? start}) async {
-    log('token = ${storage.read('token')}');
-    var url = Uri.parse('$baseUrl$getGroups?limit=$limit&start=$start');
+  static Future<List<GroupModel>> getAllRoomData({Map? mapData}) async {
+    var url = Uri.parse('$baseUrl$getroomListChat$token');
     try {
-      var responce = await http.get(url, headers: header);
+      var responce = await await http.post(url, body: mapData);
       var data = jsonDecode(responce.body);
-      log('group data is = $data');
-      if (data['status']['code'] == 200) {
-        List list = data['response'];
+      print('room data = $data');
+      if (data['api_status'] == 200) {
+        List list = data['data'];
         List<GroupModel> modellist =
             list.map((e) => GroupModel.fromJson(e)).toList();
-        modellist.removeWhere((element) => element.groupType == 1);
         return modellist;
       } else {
         return [];
@@ -179,20 +257,77 @@ class ApiUtils {
     return [];
   }
 
-  static Future<UserInfoModel> getGroupbyIds(
-      {int? limit, int? start, String? groupID}) async {
-    var url = Uri.parse('$baseUrl$getGroupsById?groupid=$groupID&limit=$limit&start=$start');
+  static Future<List<UserStoryModel>> getAllStoriesData({Map? mapData}) async {
+    var url = Uri.parse('$baseUrl$allStories$token');
     try {
-      var responce = await http.get(url, headers: header);
+      var responce = await await http.post(url, body: mapData);
       var data = jsonDecode(responce.body);
-      log('group info Data is = $data');
-      if (data['status']['code'] == 200) {
-        List list = data['response'];
-        list.removeWhere(
-            (element) => element['groupId'] != int.parse(groupID!));
-        log('Start Adding model');
-        UserInfoModel model = UserInfoModel.fromJson(list[0]);
-        log('group info Data is = $data');
+      print('stories data = $data');
+      if (data['api_status'] == 200) {
+        List list = data['stories'];
+        List<UserStoryModel> modellist =
+            list.map((e) => UserStoryModel.fromJson(e)).toList();
+        return modellist;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Exception is = $e');
+    }
+    return [];
+  }
+
+  static Future<bool> joinRoom({Map? mapData}) async {
+    var url = Uri.parse('$baseUrl$getGroupChat$token');
+    try {
+      var responce = await await http.post(url, body: mapData);
+      var data = jsonDecode(responce.body);
+      print('join room data = $data');
+      if (data['api_status'] == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print('Exception is = $e');
+    }
+    return false;
+  }
+
+  static Future<List<GroupModel>> getMainRoom(
+      {int? limit, int? start, Map? mapData}) async {
+    var url = Uri.parse('$baseUrl$getRoom$token');
+    try {
+      var responce = await await http.post(url, body: mapData);
+      var data = jsonDecode(responce.body);
+      // print('group data is = $data');
+      if (data['api_status'] == 200) {
+        List list = data['data'];
+        List<GroupModel> modellist =
+            list.map((e) => GroupModel.fromJson(e)).toList();
+        return modellist;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Exception is = $e');
+    }
+    return [];
+  }
+
+  static Future<UserInfoModel> getUserInfo(
+      {int? limit, int? start, String? userID}) async {
+    var url = Uri.parse('$baseUrl$userData$token');
+    try {
+      var responce = await http.post(url, body: {
+        'server_key': serverKey,
+        'fetch': 'user_data',
+        'user_id': userID
+      });
+      var data = jsonDecode(responce.body);
+      print('user info Data is = $data');
+      if (data['api_status'] == 200) {
+        UserInfoModel model = UserInfoModel.fromJson(data);
         return model;
       } else {
         log('group info Data not fine');
@@ -205,11 +340,22 @@ class ApiUtils {
   }
 
   static createGroup({Map? map}) async {
-    var url = Uri.parse('${baseUrl}createGroupByMember');
+    var url = Uri.parse('$baseUrl$create_group$token');
     try {
-      var responce = await http.post(url, headers: header, body: map);
+      var responce = await http.post(url, body: map);
       var data = jsonDecode(responce.body);
-      log('createGroupByMember = $data');
+      print('createGroupByMember = $data');
+    } catch (e) {
+      print('Exception is = $e');
+    }
+  }
+
+  static addGroupMember({Map? map}) async {
+    var url = Uri.parse('$baseUrl$addMemberToGroup$token');
+    try {
+      var responce = await http.post(url, body: map);
+      var data = jsonDecode(responce.body);
+      print('addGroupMember = $data');
     } catch (e) {
       print('Exception is = $e');
     }
@@ -234,19 +380,19 @@ class ApiUtils {
     return SearchUserModel();
   }
 
-  static Future<List<OneToOneChatModel>> getMessage_list(
-      {int? limit, int? start, String? groupID}) async {
-    var url = Uri.parse(
-        '$baseUrl$getMessage?limit=$limit&start=$start&groupId=$groupID');
+  static Future<List<Following>> allFriendList({int? limit, int? start}) async {
+    var url = Uri.parse('$baseUrl$friendList$token');
     try {
-      var responce = await http.get(url, headers: header);
+      var responce = await http.post(url, body: {
+        'server_key': serverKey,
+        'type': 'followers,following',
+        'user_id': '${UserDataService.userDataModel!.userData!.userId}'
+      });
       var data = jsonDecode(responce.body);
-      print('message list is this = $data');
-      if (data['status']['code'] == 200) {
-        List list = data['response'];
-        List<OneToOneChatModel> modellist =
-            list.map((e) => OneToOneChatModel.fromJson(e)).toList();
-        return modellist.reversed.toList();
+      log('friend data is = $data');
+      if (data['api_status'] == 200) {
+        FriendsListModel modellist = FriendsListModel.fromJson(data);
+        return modellist.data!.following!;
       } else {
         return [];
       }
@@ -256,22 +402,89 @@ class ApiUtils {
     return [];
   }
 
+  static Future<List<Messages>> getMessage_list(
+      {int? limit, int? start, Map? map}) async {
+    var url = Uri.parse('$baseUrl$getMessage$token');
+    try {
+      var responce = await http.post(url, body: map);
+      var data = jsonDecode(responce.body);
+      print('message list is this = $data');
+      if (data['api_status'] == 200) {
+        UserChatModel modellist = UserChatModel.fromJson(data)
+          ..messages!.reversed;
+        return modellist.messages!;
+      } else {
+        return UserChatModel(apiStatus: 400, messages: []).messages!;
+      }
+    } catch (e) {
+      print('Exception is = $e');
+    }
+    return UserChatModel(apiStatus: 400, messages: []).messages!;
+  }
+
+  static Future sendMessagetoUser({Map? map}) async {
+    var url = Uri.parse('$baseUrl$sendMessage$token');
+    try {
+      var responce = await http.post(url, body: map);
+      var data = jsonDecode(responce.body);
+      print('send message is = $data');
+    } catch (e) {
+      print('Exception is = $e');
+    }
+  }
+
+  static Future<List<Messages>> getMessage_list_forGroup(
+      {int? limit, int? start, Map? map}) async {
+    var url = Uri.parse('$baseUrl$getGroupChat$token');
+    try {
+      var responce = await http.post(url, body: map);
+      var data = jsonDecode(responce.body);
+      print('message list is this = $data');
+      if (data['api_status'] == 200) {
+        GroupChatModel modellist = GroupChatModel.fromJson(data)
+          ..data!.messages!.reversed;
+        return modellist.data!.messages!;
+      } else {
+        return UserChatModel(apiStatus: 400, messages: []).messages!;
+      }
+    } catch (e) {
+      print('Exception is = $e');
+    }
+    return UserChatModel(apiStatus: 400, messages: []).messages!;
+  }
+
   static Future<bool> getlogin({Map? map}) async {
-    var url = Uri.parse('$loginUrl$login');
+    var url = Uri.parse('$baseUrl$login');
+    print('hit login');
     try {
       var responce = await http.post(url, body: map);
       var data = jsonDecode(responce.body);
       print('profile data is = $data');
-      LoginModel model = LoginModel.fromJson(data);
-      if (model.status!.code == 200) {
-        storage.write('userID', '${data['userId']}');
-        storage.write('profile', '${data['profilePic']}');
-        storage.write('name', '${data['fullName']}');
-        storage.write('token', model.response);
-        header = {
-          'Authorization': 'Basic YWRtaW46MTIzNA==',
-          'x-auth-token': '${storage.read('token')}',
-        };
+      if (data['api_status'] == 200) {
+        LoginModel model = LoginModel.fromJson(data);
+        storage.write('userID', model.userId);
+        // storage.write('profile', '${data['profilePic']}');
+        // storage.write('name', '${data['fullName']}');
+        storage.write('token', model.accessToken);
+        return true;
+      } else {
+        snackBarFailer('${data['status']['message']}');
+        return false;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  static Future<bool> getUserData({Map? map}) async {
+    var url = Uri.parse('$baseUrl$userData$token');
+    try {
+      var responce = await http.post(url, body: map);
+      var data = jsonDecode(responce.body);
+      print('profile data is = $data');
+      if (data['api_status'] == 200) {
+        UserDataService.userDataModel = UserDataModel.fromJson(data);
+        storage.write(
+            'userData', jsonEncode(UserDataService.userDataModel!.toJson()));
         return true;
       } else {
         snackBarFailer('${data['status']['message']}');

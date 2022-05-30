@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rooya/responsive/primary_color.dart';
+import 'package:rooya/Utils/primary_color.dart';
 import '../SnackBarApp.dart';
 
 class ContactView extends StatefulWidget {

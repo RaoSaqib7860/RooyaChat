@@ -6,7 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rooya/ApiConfig/SizeConfiq.dart';
-import 'package:rooya/responsive/primary_color.dart';
+import 'package:rooya/Utils/primary_color.dart';
 
 class MapClass extends StatefulWidget {
   const MapClass({Key? key}) : super(key: key);

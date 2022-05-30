@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rooya/ApiConfig/ApiUtils.dart';
 import 'package:rooya/GlobalWidget/FileUploader.dart';
 import 'package:rooya/Providers/OneToOneModel.dart';
+import 'package:rooya/Screens/SearchUser/SearchUserModel.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:dio/dio.dart' as dio;
 
@@ -13,6 +14,8 @@ class OneToOneChatProvider extends GetxController {
   var startTyping = false.obs;
   var searchText = ''.obs;
   var isReciverTyping = false.obs;
+  var isOnline = false.obs;
+
 
   checkTypnigStatus({String? groupId}) {
     debounce(searchText, (value) {
@@ -28,13 +31,19 @@ class OneToOneChatProvider extends GetxController {
   }
 
   var oneToOneChat = <OneToOneChatModel>[].obs;
-
+  String groupID = '';
   Future getAllMessage({String? groupId}) async {
-    oneToOneChat.value =
-        await ApiUtils.getMessage_list(groupID: groupId, start: 0, limit: 100);
-    // if(oneToOneChat.isNotEmpty){
-    //   socket!.emit('announceSeen', oneToOneChat[0].message!.mId);
+    // groupID = groupId!;
+    // List<OneToOneChatModel> listData = await ApiUtils.getMessage_list(groupID: groupId, start: 0, limit: 100);
+    // if(oneToOneChat.isEmpty){
+    //   oneToOneChat.value=listData;
+    // }else{
+    //   if(listData.last.message!=oneToOneChat.last.message){
+    //     oneToOneChat.value=listData;
+    //   }
     // }
+    // oneToOneChat.value =
+    //     await ApiUtils.getMessage_list(groupID: groupId, start: 0, limit: 100);
   }
 
   sentMessageViaFile({String? filePath, String? groupId}) async {
@@ -52,7 +61,7 @@ class OneToOneChatProvider extends GetxController {
   }
 
   Socket? socket;
-
+  bool isRecive=false;
 // 'http://cc.rooyatech.com:0/socket.io/?EIO=3&transport=websocket#'
   onConnectScocket({String? groupID}) {
     //
@@ -101,21 +110,49 @@ class OneToOneChatProvider extends GetxController {
         socket!.on('newMessage', (value) {
           log('newMessage is = $value');
           oneToOneChat.insert(0, OneToOneChatModel.fromJson(value));
+         //  if(groupID!=''){
+         //    getAllMessage(groupId: groupID);
+         //  }
         });
         socket!.on('receiveSeen', (value) {
           print('receiveSeen = $value');
+          if(!isRecive){
+            isRecive=true;
+            if(groupID!=''){
+              getAllMessage(groupId: groupID);
+            }
+            Future.delayed(Duration(seconds: 2),(){
+              isRecive=false;
+            });
+          }
         });
-        socket!.on('getFetchOnReconnect', (value) {
-          print('getFetchOnReconnect = $value');
-        });
-        socket!.on('updateStatusOnReconnect', (value) {
-          print('updateStatusOnReconnect app = $value');
-        });
+        // socket!.on('getFetchOnReconnect', (value) {
+        //   print('getFetchOnReconnect = $value');
+        // });
+        // socket!.on('updateStatusOnReconnect', (value) {
+        //   print('updateStatusOnReconnect app = $value');
+        // });
         socket!.on('updateStatus', (value) {
           print('updateStatus app = $value');
+          if(value['status']==1){
+            isOnline.value=true;
+          }else{
+            isOnline.value=false;
+          }
+          if(groupID!=''){
+            getAllMessage(groupId: groupID);
+          }
         });
-        socket!.on('getSessionId', (value) {
-          print('getSessionId app = $value');
+        // socket!.on('getSessionId', (value) {
+        //   print('getSessionId app = $value');
+        // });
+        socket!.on('blockStatus', (value) {
+          print('blockStatus is = $value');
+          if(value['block']==0){
+            block_user.value=false;
+          }else{
+            block_user.value=true;
+          }
         });
       });
     } catch (e) {
@@ -123,18 +160,24 @@ class OneToOneChatProvider extends GetxController {
     }
   }
 
+  var block_user=false.obs;
+
   onSentMessage({String? message, String? groupId}) {
     print('send message');
-    socket!.emit('sendText', {
-      'message': message,
-      '_r': '${storage.read('token')}',
-      'groupId': '$groupId'
-    });
+    try{
+      socket!.emit('sendText', {
+        'message': message,
+        '_r': '${storage.read('token')}',
+        'groupId': '$groupId'
+      });
+    }catch (e){
+      print('send message exaption is = $e');
+    }
   }
 
   leaveRoom({String? groupId}) {
+    groupID='';
     socket!.emit('leaveRoom', int.parse(groupId!));
-
     socket!.close();
     socket!.dispose();
     socket!.disconnect();
@@ -169,5 +212,10 @@ class OneToOneChatProvider extends GetxController {
       }
     } catch (e) {}
     return '';
+  }
+
+  var searchUserModel = SearchUserModel().obs;
+  getFriendList() async {
+    searchUserModel.value = await ApiUtils.getfriendList(limit: 50, start: 0);
   }
 }

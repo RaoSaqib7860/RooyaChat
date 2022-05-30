@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rooya/ApiConfig/SizeConfiq.dart';
-import 'package:rooya/responsive/primary_color.dart';
+import 'package:rooya/Utils/primary_color.dart';
 
 class GetAllContactsPage extends StatefulWidget {
   const GetAllContactsPage({Key? key}) : super(key: key);

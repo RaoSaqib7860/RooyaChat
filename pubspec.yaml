@@ -70,6 +70,20 @@ dependencies:
   permission_handler: ^8.3.0
   url_launcher: ^6.0.18
   contacts_service: ^0.6.3
+  modal_bottom_sheet: ^2.0.1
+  scroll_to_index: ^2.1.1
+  animate_do: ^2.1.0
+  google_places_flutter: ^2.0.5
+  dashed_circle: ^0.0.2
+  lottie: ^1.2.2
+  font_awesome_flutter: ^9.2.0
+  vibration: ^1.7.4-nullsafety.0
+  flutter_colorpicker: ^1.0.3
+  encrypt: ^5.0.1
+  syncfusion_flutter_sliders: ^20.1.57
+  avatar_glow: ^2.0.2
+  story_view:
+    path: ./lib/Plugins/story_view-master
 
 dev_dependencies:
   flutter_test:
